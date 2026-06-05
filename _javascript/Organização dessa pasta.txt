@@ -1,0 +1,1 @@
+Todos os arquivos .js ficam nessa pasta, com exceção do backend principal ( server.js )

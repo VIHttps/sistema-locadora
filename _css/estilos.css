@@ -1,0 +1,26 @@
+
+        /* body: seleciona o corpo da página */
+        /* font-family: define a fonte do texto */
+        /* margin: define o espaçamento externo */
+        body { font-family: arial; margin: 20px; }
+
+        /* button: seleciona o botão */
+        /* padding: define o espaçamento interno */
+        /* cursor: pointer: muda o cursor para mão ao passar sobre o botão */
+        button { padding: 10px 20px; cursor: pointer; }
+
+        /* table: seleciona a tabela */
+        /* border-collapse: collapse: remove espaços entre as bordas */
+        /* margin-top: define espaçamento acima da tabela */
+        /* width: 100%: faz a tabela ocupar toda a largura disponível */
+        table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+
+        /* th, td: seleciona as células de cabeçalho e as células comuns */
+        /* border: adiciona borda */
+        /* padding: define espaçamento interno */
+        /* text-align: left: alinha o texto à esquerda */
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+
+        /* th: seleciona apenas as células de cabeçalho */
+        /* background-color: define a cor de fundo */
+        th { background-color: #aed0ff; }

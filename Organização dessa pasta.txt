@@ -1,0 +1,3 @@
+O backend principal fica nessa pasta ( server.js )
+Os dados do servidor ficam nessa pasta ( .env )
+Todos os arquivos html ficam nessa pasta 
