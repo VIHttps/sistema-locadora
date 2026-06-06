@@ -13,14 +13,13 @@ USE AULAS;
 
 -- CREATE TABLE CATEGORIAS
 -- cria a tabela de categorias dos filmes
--- INT(11) significa número inteiro com até 11 dígitos
 -- NOT NULL indica que o campo não pode ficar vazio
 -- PRIMARY KEY identifica cada registro de forma única
 -- AUTO_INCREMENT faz o número aumentar automaticamente
 -- VARCHAR(150) armazena texto com até 150 caracteres
 -- DATETIME armazena data e hora
 CREATE TABLE CATEGORIAS (
-    CAT_ID INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    CAT_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     CAT_NOME VARCHAR(150) NOT NULL,
     CAT_DATA_CAD DATETIME
 );
@@ -30,7 +29,7 @@ CREATE TABLE CATEGORIAS (
 -- DECIMAL(10,2) armazena números com 10 dígitos no total e 2 casas decimais
 -- CHECK (CLI_SALDO >= 0) impede valores negativos no saldo
 CREATE TABLE CLIENTES (
-    CLI_ID INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    CLI_ID NOT NULL PRIMARY KEY AUTO_INCREMENT,
     CLI_NOME VARCHAR(50) NOT NULL,
     CLI_TELEFONE VARCHAR(25),
     CLI_DATA_CAD DATETIME,
@@ -43,12 +42,13 @@ CREATE TABLE CLIENTES (
 -- define que FIL_CAT_ID é uma chave estrangeira que aponta para CAT_ID na tabela CATEGORIAS
 -- o código da categoria deve existir na tabela CATEGORIAS antes de ser usado aqui
 CREATE TABLE FILMES (
-    FIL_ID INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    FIL_ID NOT NULL PRIMARY KEY AUTO_INCREMENT,
     FIL_NOME VARCHAR(150) NOT NULL,
     FIL_CAT_ID INT,
+    QUANTIDADE INT NOT NULL DEFAULT 1, -- quantidade
     FIL_DATA_CAD DATETIME,
-    FOREIGN KEY (FIL_CAT_ID) REFERENCES CATEGORIAS(CAT_ID)
-);
+    FOREIGN KEY (FIL_CAT_ID) REFERENCES CATEGORIAS(CAT_ID) ON DELETE SET NULL ON UPDATE CASCADE
+); -- define que se uma categoria for deletada (FIL_CAT_ID) deve ser nulo
 
 -- CREATE TABLE LOCACOES
 -- cria a tabela de locações
@@ -56,11 +56,11 @@ CREATE TABLE FILMES (
 -- define que LOC_CLI_ID é uma chave estrangeira que aponta para CLI_ID na tabela CLIENTES
 -- o código do cliente deve existir na tabela CLIENTES antes de ser usado aqui
 CREATE TABLE LOCACOES (
-    LOC_ID INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    LOC_ID NOT NULL PRIMARY KEY AUTO_INCREMENT,
     LOC_CLI_ID INT,
     LOC_DATA_CAD DATETIME,
-    FOREIGN KEY (LOC_CLI_ID) REFERENCES CLIENTES(CLI_ID)
-);
+    FOREIGN KEY (LOC_CLI_ID) REFERENCES CLIENTES(CLI_ID) ON DELETE CASCADE ON UPDATE CASCADE
+); -- define que se um cliente for deletado, as locações também devem ser ( cascade )
 
 -- CREATE TABLE ITENS
 -- cria a tabela de itens de locação
@@ -70,13 +70,14 @@ CREATE TABLE LOCACOES (
 -- define que ITN_FIL_ID é uma chave estrangeira que aponta para FIL_ID na tabela FILMES
 -- CHECK (ITN_VALOR_LOC >= 0) impede valores negativos no valor da locação
 CREATE TABLE ITENS (
-    ITN_ID INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    ITN_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     ITN_LOC_ID INT,
     ITN_FIL_ID INT,
     ITN_VALOR_LOC DECIMAL(10,2) CHECK (ITN_VALOR_LOC >= 0),
-    FOREIGN KEY (ITN_LOC_ID) REFERENCES LOCACOES(LOC_ID),
-    FOREIGN KEY (ITN_FIL_ID) REFERENCES FILMES(FIL_ID)
-);
+    FOREIGN KEY (ITN_LOC_ID) REFERENCES LOCACOES(LOC_ID) ON DELETE CASCADE, 
+    FOREIGN KEY (ITN_FIL_ID) REFERENCES FILMES(FIL_ID) ON DELETE RESTRICT
+); -- define que se a locação pai for deletada, os itens também devem ser ( cascade )
+   -- define que se um filme for deletado, a operação deve ser impedida ( restrict ) se houver itens vinculados
 
 -- INSERT INTO CATEGORIAS
 -- insere dados na tabela CATEGORIAS
