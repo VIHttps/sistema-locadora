@@ -1,0 +1,16 @@
+ORDEM RECOMENDADA DE IMPLEMENTAÇÃO GERAL DO TRABALHO
+
+1. server.js (pool + rotas clientes)
+2. server.js (rotas categorias)
+3. server.js (rotas filmes)
+4. server.js (rota POST /api/locacoes)
+5. server.js (rota GET /api/locacoes)
+
+6. _javascript/utils.js
+
+7. clientes.html + clientes.js
+8. categorias.html + categorias.js
+9. filmes.html + filmes.js
+10. locacao.html + locacao.js
+
+11. index.html (atualizar com menu)
