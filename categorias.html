@@ -1,24 +1,75 @@
-<!--⚠️========================⚠️-->
-<!-- "Todos os formulários devem apresentar uma parte destinada à manipulação 
-dos dados (Insert, Delete, Update e Select), preferencialmente na parte superior da tela;
-e, outra contendo grid com todos os dados ativos (preferencialmente na parte inferior da tela)." -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Locadora - Categorias</title>
+    <link rel="stylesheet" href="_css/estilos.css">
+</head>
+<body>
 
+    <header>
+        <h1>Sistema de <span id="locadora">Locadora</span></h1>
+        
+        <nav class="menu-principal">
+            <a href="index.html">Início</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="filmes.html">Filmes</a>
+            <a href="categorias.html" class="active">Categorias</a>
+            <a href="locacao.html" class="destaque">Nova Locação ➔</a>
+        </nav>
+    </header>
 
+    <main>
+        <section class="secao-consultas">
+            <h2>Categorias Cadastradas</h2>
+            <p>Lista de categorias de filmes ativas no sistema. Clique em <strong>Editar</strong> para gerenciar os dados do registro.</p>
 
-<!--⚠️========================⚠️(1) -->
-<!--INSERIR: INDICES COM LINK PARA CADA ENTIDADE ( OBRIGATÓRIO )  -->
-<!--OBS: seguir o mesmo modelo do index.html  -->
-<!-- ========================= -->
+            <div style="margin-bottom: 0; margin-top: -10px; text-align: left;">
+                <button id="btnNovaCategoria" class="btn-sucesso" style="width: auto; padding: 10px 20px;">+ Nova Categoria</button>
+            </div>
 
+            <div class="container-tabela">
+                <table id="tabelaCategorias">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">ID</th>
+                            <th>Nome da Categoria</th>
+                            <th class="coluna-acoes">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabelaCategorias">
+                        <tr>
+                            <td colspan="3" class="placeholder-tabela">Carregando categorias...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
+    <div id="modalCategoria" class="modal-overlay">
+        <div class="modal-container">
+            <h3>Gerenciar Registro de Categoria</h3>
+            <p>Modifique o nome abaixo ou remova a categoria do sistema.</p>
+            
+            <form id="formCategoria">
+                <input type="hidden" id="txtId" name="txtId">
 
-<!--⚠️========================⚠️(2) -->
-<!--INSERIR: FORMULÁRIO NA PARTE SUPERIOR PARA INSERT E UPDATE ( OBRIGATÓRIO )  -->
-<!--CAMPOS: nome da categoria, salvar, cancelar -->
-<!-- ========================= -->
+                <div class="grupo-campo">
+                    <label for="txtNome">Nome da Categoria:</label>
+                    <input type="text" id="txtNome" name="txtNome" placeholder="Ex: COMÉDIA, TERROR" required>
+                </div>
 
+                <div class="modal-acoes">
+                    <button type="submit" id="btnSalvar" class="btn-sucesso">Salvar Alterações</button>
+                    <button type="button" id="btnExcluirModal" class="btn-alerta">Excluir Categoria</button>
+                    <button type="button" id="btnCancelar" class="btn-neutro">Voltar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-<!--⚠️========================⚠️(3) -->
-<!--INSERIR: GRID NA PARTE INFERIOR PARA SELECT, UPDATE E DELETE ( OBRIGATÓRIO )  -->
-<!--SESSÃO DE CATEGORIAS CADASTRADOS (TABELA): id, nome ações editar e excluir -->
-<!-- ========================= -->
+    <script src="_javascript/categorias.js"></script>
+</body>
+</html>

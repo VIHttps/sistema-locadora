@@ -1,43 +1,447 @@
-        /* ESTILOS GLOBAIS
+/* ESTILOS GLOBAIS
 
 
 
-        /*⚠️========================⚠️ 
-        /* MODIFICAR ( OBRIGATÓRIO ) :
-        /*=========================== 
-        /* Padrão com formulário na parte superior e grid na parte inferior
-        /*⚠️========================⚠️ 
+/*⚠️========================⚠️ 
+/* MODIFICAR ( OBRIGATÓRIO ) :
+/*=========================== 
+/* Padrão com formulário na parte superior e grid na parte inferior
+/*⚠️========================⚠️ 
 
 
-        /*⚠️========================⚠️ 
-        /* MODIFICAR ( OPCIONAL ) :
-        =============================
-        /* Refinar o CSS para uma aparência mais amigável e intuitiva, ainda em coesão com o Backend
-        /*⚠️========================⚠️ 
+/*⚠️========================⚠️ 
+/* MODIFICAR ( OPCIONAL ) :
+=============================
+/* Refinar o CSS para uma aparência mais amigável e intuitiva, ainda em coesão com o Backend
+/*⚠️========================⚠️ 
         
-        
-        /* body: seleciona o corpo da página */
-        /* font-family: define a fonte do texto */
-        /* margin: define o espaçamento externo */
-        body { font-family: arial; margin: 20px; }
 
-        /* button: seleciona o botão */
-        /* padding: define o espaçamento interno */
-        /* cursor: pointer: muda o cursor para mão ao passar sobre o botão */
-        button { padding: 10px 20px; cursor: pointer; }
+/* body: seleciona o corpo da página */
+/* font-family: define a fonte do texto */
+/* margin: define o espaçamento externo */
+body { 
+        font-family: 'Segoe UI', Arial, sans-serif; 
+        margin: 0; 
+        padding: 0;
+        background-color: #f9f9f9;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+}
 
-        /* table: seleciona a tabela */
-        /* border-collapse: collapse: remove espaços entre as bordas */
-        /* margin-top: define espaçamento acima da tabela */
-        /* width: 100%: faz a tabela ocupar toda a largura disponível */
-        table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+/* button: seleciona o botão */
+/* padding: define o espaçamento interno */
+/* cursor: pointer: muda o cursor para mão ao passar sobre o botão */
+button{ 
+        padding: 10px 20px;
+        ; cursor: pointer; 
+}
 
-        /* th, td: seleciona as células de cabeçalho e as células comuns */
-        /* border: adiciona borda */
-        /* padding: define espaçamento interno */
-        /* text-align: left: alinha o texto à esquerda */
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+/* table: seleciona a tabela */
+/* border-collapse: collapse: remove espaços entre as bordas */
+/* margin-top: define espaçamento acima da tabela */
+/* width: 100%: faz a tabela ocupar toda a largura disponível */
+table { border-collapse: collapse;
+        margin-top: 20px; 
+        width: 100%; 
+}
 
-        /* th: seleciona apenas as células de cabeçalho */
-        /* background-color: define a cor de fundo */
-        th { background-color: #aed0ff; }
+/* th, td: seleciona as células de cabeçalho e as células comuns */
+/* border: adiciona borda */
+/* padding: define espaçamento interno */
+/* text-align: left: alinha o texto à esquerda */
+th, td { border: 1px solid #ccc; 
+        padding: 8px; 
+        text-align: left; 
+}
+
+/* th: seleciona apenas as células de cabeçalho */
+/* background-color: define a cor de fundo */
+th { 
+        background-color: #aed0ff; 
+}
+
+header {
+    background-color: #1a1a1a; /* Preto predominante */
+    color: #ffffff;
+    padding: 25px 20px;
+    text-align: center;
+    border-bottom: 4px solid #0c8db4; /* Linha de destaque em Vermelho */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0 0 15px 0;
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+#locadora{
+        color: #0c8db4;
+}
+
+.menu-principal {
+    display: flex;
+    justify-content: center; /* Centraliza o menu na tela horizontalmente */
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.menu-principal a {
+    color: #cccccc;
+    text-decoration: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+}
+
+.menu-principal a:hover {
+    color: #0c8db4;
+    background-color: #333333;
+}
+
+.menu-principal a.active {
+    color: #ffffff;
+    background-color: #0c8db4; /* Destaque em Vermelho */
+}
+
+.menu-principal a.destaque {
+    background-color: #ffffff;
+    color: #0c8db4;
+    border: 1px solid #0c8db4;
+}
+
+.menu-principal a.destaque:hover {
+    background-color: #0c8db4;
+    color: #ffffff;
+    box-shadow: 0 0 8px rgba(12, 147, 180, 0.5);
+}
+
+main {
+    flex: 1;
+    max-width: 1200px;
+    width: 90%;
+    margin: 30px auto; /* Centraliza todo o bloco de conteúdo na tela */
+}
+
+.secao-consultas {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.secao-consultas h2 {
+    margin-top: 0;
+    color: #1a1a1a;
+    font-size: 1.5rem;
+    border-left: 5px solid #0c8db4; /* Detalhe em vermelho na lateral do título */
+    padding-left: 10px;
+}
+
+.acoes-consulta {
+    margin: 20px 0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+button { 
+    padding: 12px 24px; 
+    cursor: pointer; 
+    background-color: #1a1a1a; /* Preto */
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+    background-color: #0c8db4; /* Altera para vermelho ao passar o mouse */
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.container-tabela {
+    overflow-x: auto;
+    margin-top: 25px;
+}
+
+table { 
+    border-collapse: collapse; 
+    width: 100%; 
+    background-color: #ffffff;
+}
+
+th, td { 
+    padding: 12px 15px; 
+    text-align: left; 
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 0.9rem;
+}
+
+th { 
+    background-color: #1a1a1a; /* Cabeçalho Preto */
+    color: #ffffff;            /* Texto Branco */
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1; /* Linha ganha foco visual discreto */
+}
+
+.placeholder-tabela {
+    text-align: center;
+    color: #777777;
+    font-style: italic;
+    padding: 30px 0;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Sombra preta transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+
+/* Quando o modal ganha a classe .active, ele aparece */
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Caixa branca centralizada onde fica o formulário */
+.modal-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: abrirModal 0.3s ease;
+}
+
+@keyframes abrirModal {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-container h3 {
+    margin-top: 0;
+    color: #111;
+    font-size: 20px;
+}
+
+.modal-container p {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Campos empilhados dentro do modal */
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.grupo-campo label {
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.grupo-campo input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Botões alinhados na base do Modal */
+.modal-acoes {
+    display: flex;
+    flex-direction: column; /* Botões empilhados para melhor clique */
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-acoes button {
+    padding: 11px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.btn-sucesso { background-color: #000000; color: white; }
+.btn-alerta { background-color: #000000; color: white; }
+.btn-neutro { background-color: #6c757d; color: white; }
+
+.coluna-acoes { text-align: center; }
+
+.btn-editar {
+    background-color: #000000;
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-editar:hover{
+    background-color: #0c8db4;
+}
+
+.btn-sucesso{ 
+    width:auto;
+    padding: 10px 20px;
+    margin-top: 20px;
+}
+
+/* ==========================================================================
+   ESTILOS EXCLUSIVOS DA TELA DE NOVA LOCAÇÃO
+   ========================================================================== */
+
+.secao-cadastro-locacao {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.linha-formulario {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.campo-grande { flex: 2; min-width: 250px; }
+.campo-medio { flex: 1; min-width: 180px; }
+
+.secao-cadastro-locacao select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+    width: 100%;
+}
+
+.divisor-locacao {
+    border: 0;
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 25px 0;
+}
+
+/* Container de linhas de filmes dinâmicos */
+.item-filme-linha {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    border-left: 4px solid #0056b3;
+}
+
+.bloco-adicionar-item {
+    margin: 15px 0 30px 0;
+}
+
+.btn-secundario {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.btn-secundario:hover { background-color: #5a6268; }
+
+.btn-remover-item {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-remover-item:hover { background-color: #bd2130; }
+
+.acoes-locacao {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-sucesso-largo {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    flex: 2;
+}
+
+.btn-sucesso-largo:hover { background-color: #218838; }
+
+.btn-neutro-largo {
+    background-color: #e2e3e5;
+    color: #383d41;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    flex: 1;
+}
+
+.btn-neutro-largo:hover { 
+    background-color: #d6d8db;
+}
+
+.btnNovoCliente{
+    margin-bottom: 15px;
+    text-align: left;
+}

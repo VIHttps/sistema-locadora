@@ -11,11 +11,19 @@ require('dotenv').config();
 const app = express();
 
 // define a porta onde o servidor vai rodar
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3300;
 
 // middlewares para permitir a comunicacao correta entre a pagina, o js e o servidor
 app.use(express.json());
 app.use(express.static(__dirname));
+
+// Middleware para liberar o CORS (Evita o erro de bloqueio no fetch do navegador)
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    next();
+});
 
 // pool de conexoes com o banco de dados
 // utilizar pool em vez de createConnection e a melhor pratica para aplicacoes web
@@ -400,7 +408,7 @@ app.get('/api/locacoes', async (req, res) => {
 // ==================== ROTA PARA PÁGINA INICIAL ====================
 
 // cria uma rota para a pagina inicial (endereco /)
-// quando o navegador acessar http://localhost:3000, envia o arquivo index.html
+// quando o navegador acessar http://localhost:3306, envia o arquivo index.html
 app.get('/', (req, res) => {
     // sendFile envia um arquivo estatico para o navegador
     // __dirname e o caminho da pasta onde este arquivo server.js esta localizado
@@ -415,3 +423,6 @@ app.listen(port, () => {
     console.log(`servidor rodando em: http://localhost:${port}`);
     console.log(`abrir o navegador em: http://localhost:${port}`);
 });
+
+const cors = require('cors');
+app.use(cors());

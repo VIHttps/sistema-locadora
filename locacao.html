@@ -1,26 +1,64 @@
-<!--⚠️========================⚠️-->
-<!-- "Todos os formulários devem apresentar uma parte destinada à manipulação 
-dos dados (Insert, Delete, Update e Select), preferencialmente na parte superior da tela;
-e, outra contendo grid com todos os dados ativos (preferencialmente na parte inferior da tela)." -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Locadora - Nova Locação</title>
+    <link rel="stylesheet" href="_css/estilos.css">
+    <link rel="stylesheet" href="_css/locacao.css">
+</head>
+<body>
 
+    <header>
+        <h1>Sistema de <span id="locadora">Locadora</span></h1>
+        
+        <nav class="menu-principal">
+            <a href="index.html">Início</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="filmes.html">Filmes</a>
+            <a href="categorias.html">Categorias</a>
+            <a href="locacao.html" class="active destaque">Nova Locação ➔</a>
+        </nav>
+    </header>
 
+    <main>
+        <section class="secao-cadastro-locacao">
+            <h2>Registrar Nova Locação</h2>
+            <p>Preencha os dados do cliente e adicione os filmes desejados abaixo cuidando do controle de estoque.</p>
 
-<!--⚠️========================⚠️(1) -->
-<!--INSERIR: INDICES COM LINK PARA CADA ENTIDADE ( OBRIGATÓRIO )  -->
-<!--OBS: seguir o mesmo modelo do index.html  -->
-<!-- ========================= -->
+            <form id="formLocacao">
+                <div class="linha-formulario">
+                    <div class="grupo-campo campo-grande">
+                        <label for="selCliente">Cliente:</label>
+                        <select id="selCliente" required>
+                            <option value="">Selecione um cliente...</option>
+                        </select>
+                    </div>
 
+                    <div class="grupo-campo campo-medio">
+                        <label for="txtDataLocacao">Data da Locação:</label>
+                        <input type="date" id="txtDataLocacao" required>
+                    </div>
+                </div>
 
+                <hr class="divisor-locacao">
 
-<!--⚠️========================⚠️(2) -->
-<!--INSERIR: FORMULÁRIO NA PARTE SUPERIOR PARA INSERT DE LOCAÇÃO( OBRIGATÓRIO )  -->
-<!--CAMPOS: selecione um filme, valor da locação, adicionar outro filme, ações registrar locação, 
-limpar formulário e cancelar -->
-<!-- ========================= -->
+                <h3>Filmes Selecionados</h3>
+                <div id="containerItensLocacao">
+                    </div>
 
+                <div class="bloco-adicionar-item">
+                    <button type="button" id="btnAdicionarItem" class="btn-secundario">+ Adicionar Outro Filme</button>
+                </div>
 
+                <div class="acoes-locacao">
+                    <button type="submit" class="btn-sucesso-largo">Finalizar e Registrar Locação</button>
+                    <button type="button" id="btnCancelarLocacao" class="btn-neutro-largo">Limpar Formulário</button>
+                </div>
+            </form>
+        </section>
+    </main>
 
-<!--⚠️========================⚠️(3) -->
-<!--INSERIR: GRID NA PARTE INFERIOR PARA CONSULTAR LOCAÇÕES ( OPCIONAL )  -->
-<!--SESSÃO DE FILMES CADASTRADOS (TABELA): id, clientes, data, filme, valor, ação carregar-->
-<!-- ========================= -->
+    <script src="_javascript/locacao.js"></script>
+</body>
+</html>

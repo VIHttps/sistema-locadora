@@ -1,24 +1,81 @@
-<!--⚠️========================⚠️-->
-<!-- "Todos os formulários devem apresentar uma parte destinada à manipulação 
-dos dados (Insert, Delete, Update e Select), preferencialmente na parte superior da tela;
-e, outra contendo grid com todos os dados ativos (preferencialmente na parte inferior da tela)." -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Locadora - Filmes</title>
+    <link rel="stylesheet" href="_css/estilos.css">
+</head>
+<body>
 
+    <header>
+        <h1>Sistema de <span id="locadora">Locadora</span></h1>
+        
+        <nav class="menu-principal">
+            <a href="index.html">Início</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="filmes.html" class="active">Filmes</a>
+            <a href="categorias.html">Categorias</a>
+            <a href="locacao.html" class="destaque">Nova Locação ➔</a>
+        </nav>
+    </header>
 
+    <main>
+        <section class="secao-consultas">
+            <h2>Filmes Cadastrados</h2>
+            <p>Lista de filmes disponíveis no acervo. Clique em <strong>Editar</strong> para gerenciar os dados do registro.</p>
 
-<!--⚠️========================⚠️(1) -->
-<!--INSERIR: INDICES COM LINK PARA CADA ENTIDADE ( OBRIGATÓRIO )  -->
-<!--OBS: seguir o mesmo modelo do index.html  -->
-<!-- ========================= -->
+            <div style="margin-bottom: 0; margin-top: -10px; text-align: left;">
+                <button id="btnNovoFilme" class="btn-sucesso" style="width: auto; padding: 10px 20px;">+ Novo Filme</button>
+            </div>
 
+            <div class="container-tabela">
+                <table id="tabelaFilmes">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Categoria</th>
+                            <th class="coluna-acoes">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabelaFilmes">
+                        <tr>
+                            <td colspan="4" class="placeholder-tabela">Carregando filmes...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
+    <div id="modalFilme" class="modal-overlay">
+        <div class="modal-container">
+            <h3>Gerenciar Registro de Filme</h3>
+            <p>Modifique as informações abaixo ou remova o filme do acervo.</p>
+            
+            <form id="formFilme">
+                <input type="hidden" id="txtId" name="txtId">
 
-<!--⚠️========================⚠️(2) -->
-<!--INSERIR: FORMULÁRIO NA PARTE SUPERIOR PARA INSERT E UPDATE ( OBRIGATÓRIO )  -->
-<!--CAMPOS: nome do filme, quantidade em estoque, categoria, salvar, cancelar -->
-<!-- ========================= -->
+                <div class="grupo-campo">
+                    <label for="txtTitulo">Título do Filme:</label>
+                    <input type="text" id="txtTitulo" name="txtTitulo" required>
+                </div>
 
+                <div class="grupo-campo">
+                    <label for="selCategoria">Categoria (ID por enquanto):</label>
+                    <input type="number" id="selCategoria" name="selCategoria" placeholder="Ex: 1 para Ação, 2 para Drama" required>
+                </div>
 
-<!--⚠️========================⚠️(3) -->
-<!--INSERIR: GRID NA PARTE INFERIOR PARA SELECT, UPDATE E DELETE ( OBRIGATÓRIO )  -->
-<!--SESSÃO DE FILMES CADASTRADOS (TABELA): id, nome, categoria, estoque, ações editar e excluir -->
-<!-- ========================= -->
+                <div class="modal-acoes">
+                    <button type="submit" id="btnSalvar" class="btn-sucesso">Salvar Alterações</button>
+                    <button type="button" id="btnExcluirModal" class="btn-alerta">Excluir Filme</button>
+                    <button type="button" id="btnCancelar" class="btn-neutro">Voltar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="_javascript/filmes.js"></script>
+</body>
+</html>

@@ -1,58 +1,58 @@
-<!-- MENU PRINCIPAL -->
-
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Sistema de Locadora</title>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Locadora - Início</title>
+    <link rel="stylesheet" href="_css/estilos.css">
+</head>
+<body>
+
+    <header>
+        <h1>Sistema de <span id="locadora">Locadora</span></h1>
         
-    </head>
-<link rel="stylesheet" href="_css/estilos.css">
-        <body>
-            <h1>Sistema de Locadora</h1>
+        <nav class="menu-principal">
+            <a href="index.html" class="active">Início</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="filmes.html">Filmes</a>
+            <a href="categorias.html">Categorias</a>
+            <a href="locacao.html" class="destaque">Nova Locação ➔</a>
+        </nav>
+    </header>
 
+    <main>
+        <section class="secao-consultas">
+            <h2>Consulta Geral de Locações (Relatório Integrado)</h2>
+            <p>Clique no botão abaixo para listar todos os registros ativos cruzando dados de clientes, filmes e valores.</p>
+            
+            <div class="acoes-consulta">
+                <button id="btnBuscar">Buscar Locações Ativas</button>
+            </div>
 
-            <!--⚠️========================⚠️(1) -->
-            <!--INSERIR: INDICES COM LINK PARA CADA ENTIDADE ( OBRIGATÓRIO )  -->
-            <!-- ========================= -->
-            <!--ENTIDADES: início, clientes, filmes, categorias, nova locação -->
-            <!--⚠️========================⚠️ -->
-
-
-
-            <!--⚠️========================⚠️ (2) -->
-            <!-- MODIFICAR: DEFINIR INTUITO DESSA TABELA APENAS PARA CONSULTA DE LOCAÇÕES DENTRO DE UMA SESSÃO SEPARADA A BUSCAS-->
-            <!-- OBS: manter a funcionalidade original de JOIN  -->
-            <!--⚠️========================⚠️ -->
-
-
-
-              <button id="btnBuscar" style="background:#007bff;color:white;border:none;padding:8px 12px;">buscar locações</button>
-        <table id="tabelaDados">
-    <thead>
-                <tr>
-                    <th>id cliente</th>
-                    <th>nome do cliente</th>
-                    <th>saldo</th>
-                    <th>id locação</th>
-                    <th>data da locação</th>
-                    <th>filme</th>
-                    <th>categoria</th>
-                    <th>valor do item</th>
-                </tr>
+            <div class="container-tabela">
+                <table id="tabelaDados">
+                    <thead>
+                        <tr>
+                            <th>ID Cliente</th>
+                            <th>Nome do Cliente</th>
+                            <th>Saldo (R$)</th>
+                            <th>ID Locação</th>
+                            <th>Data da Locação</th>
+                            <th>Filme Alugado</th>
+                            <th>Categoria</th>
+                            <th>Valor do Item (R$)</th>
+                        </tr>
                     </thead>
                     <tbody id="corpoTabela">
-                <tr><td colspan="8">clique no botão para carregar</td></tr>
-            </tbody>
-        </table>
+                        <tr>
+                            <td colspan="8" class="placeholder-tabela">Clique no botão acima para carregar os dados do servidor.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
-
-
-
-<!--⚠️========================⚠️(3) -->
-<!--INSERIR: LINK PARA O JAVASCRIPT DAS LOCAÇÕES -->
-<!-- ========================= -->
-<script src="_javascript/scripts.js"></script>
-
-            </body>
+    <script src="_javascript/scripts.js"></script>
+</body>
 </html>

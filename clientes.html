@@ -1,22 +1,87 @@
-<!--⚠️========================⚠️-->
-<!-- "Todos os formulários devem apresentar uma parte destinada à manipulação 
-dos dados (Insert, Delete, Update e Select), preferencialmente na parte superior da tela;
-e, outra contendo grid com todos os dados ativos (preferencialmente na parte inferior da tela)." -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Locadora - Clientes</title>
+    <link rel="stylesheet" href="_css/estilos.css">
+</head>
+<body>
 
+    <header>
+        <h1>Sistema de <span id="locadora">Locadora</span></h1>
+        
+        <nav class="menu-principal">
+            <a href="index.html">Início</a>
+            <a href="clientes.html" class="active">Clientes</a>
+            <a href="filmes.html">Filmes</a>
+            <a href="categorias.html">Categorias</a>
+            <a href="locacao.html" class="destaque">Nova Locação ➔</a>
+        </nav>
+    </header>
 
-<!--⚠️========================⚠️(1) -->
-<!--INSERIR: INDICES COM LINK PARA CADA ENTIDADE ( OBRIGATÓRIO )  -->
-<!--OBS: seguir o mesmo modelo do index.html  -->
-<!-- ========================= -->
+    <main>
+        <section class="secao-consultas">
+            <h2>Clientes Cadastrados</h2>
+            <p>Lista de clientes ativos no sistema. Clique em <strong>Editar</strong> para gerenciar os dados do registro.</p>
 
+            <div style="margin-bottom: 15px; text-align: left;">
+                <button id="btnNovoCliente">+ Novo Cliente</button>
+            </div>
 
-<!--⚠️========================⚠️(2) -->
-<!--INSERIR: FORMULÁRIO NA PARTE SUPERIOR ( OBRIGATÓRIO )  -->
-<!--CAMPOS: nome, telefone, saldo, salvar, cancelar -->
-<!-- ========================= -->
+            <div class="container-tabela">
+                <table id="tabelaClientes">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Telefone</th>
+                            <th>Saldo (R$)</th>
+                            <th class="coluna-acoes">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabelaClientes">
+                        <tr>
+                            <td colspan="5" class="placeholder-tabela">Carregando clientes...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
+    <div id="modalCliente" class="modal-overlay">
+        <div class="modal-container">
+            <h3>Gerenciar Registro de Cliente</h3>
+            <p>Modifique as informações abaixo ou remova o cliente do sistema.</p>
+            
+            <form id="formCliente">
+                <input type="hidden" id="txtId" name="txtId">
 
-<!--⚠️========================⚠️(3) -->
-<!--INSERIR: GRID NA PARTE INFERIOR( OBRIGATÓRIO )  -->
-<!--SESSÃO DE CLIENTES CADASTRADOS (TABELA): id, nome, telefone, saldo, ações editar e excluir -->
-<!-- ========================= -->
+                <div class="grupo-campo">
+                    <label for="txtNome">Nome do Cliente:</label>
+                    <input type="text" id="txtNome" name="txtNome" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="txtTelefone">Telefone:</label>
+                    <input type="text" id="txtTelefone" name="txtTelefone">
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="txtSaldo">Saldo (R$):</label>
+                    <input type="number" id="txtSaldo" name="txtSaldo" step="0.01">
+                </div>
+
+                <div class="modal-acoes">
+                    <button type="submit" id="btnSalvar" class="btn-sucesso">Salvar Alterações</button>
+                    <button type="button" id="btnExcluirModal" class="btn-alerta">Excluir Cliente</button>
+                    <button type="button" id="btnCancelar" class="btn-neutro">Voltar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="_javascript/clientes.js"></script>
+</body>
+</html>
