@@ -29,7 +29,6 @@ CREATE TABLE CATEGORIAS (
 -- DECIMAL(10,2) armazena números com 10 dígitos no total e 2 casas decimais
 -- CHECK (CLI_SALDO >= 0) impede valores negativos no saldo
 CREATE TABLE CLIENTES (
-    CLI_ID NOT NULL PRIMARY KEY AUTO_INCREMENT,
     CLI_NOME VARCHAR(50) NOT NULL,
     CLI_TELEFONE VARCHAR(25),
     CLI_DATA_CAD DATETIME,
@@ -42,7 +41,6 @@ CREATE TABLE CLIENTES (
 -- define que FIL_CAT_ID é uma chave estrangeira que aponta para CAT_ID na tabela CATEGORIAS
 -- o código da categoria deve existir na tabela CATEGORIAS antes de ser usado aqui
 CREATE TABLE FILMES (
-    FIL_ID NOT NULL PRIMARY KEY AUTO_INCREMENT,
     FIL_NOME VARCHAR(150) NOT NULL,
     FIL_CAT_ID INT,
     QUANTIDADE INT NOT NULL DEFAULT 1, -- quantidade
@@ -56,7 +54,6 @@ CREATE TABLE FILMES (
 -- define que LOC_CLI_ID é uma chave estrangeira que aponta para CLI_ID na tabela CLIENTES
 -- o código do cliente deve existir na tabela CLIENTES antes de ser usado aqui
 CREATE TABLE LOCACOES (
-    LOC_ID NOT NULL PRIMARY KEY AUTO_INCREMENT,
     LOC_CLI_ID INT,
     LOC_DATA_CAD DATETIME,
     FOREIGN KEY (LOC_CLI_ID) REFERENCES CLIENTES(CLI_ID) ON DELETE CASCADE ON UPDATE CASCADE
