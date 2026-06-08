@@ -1,18 +1,15 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Mock de dados mantido para seus testes locais
-    let listaClientes = [
-        { cli_id: 1, cli_nome: "JOAO BATISTA", cli_fone: "(62) 98888-1111", cli_saldo: "100.00" },
-        { cli_id: 2, cli_nome: "JOSE CARLOS", cli_fone: "(62) 99999-2222", cli_saldo: "150.00" },
-        { cli_id: 3, cli_nome: "MARIA EDUARDA", cli_fone: "(62) 98765-4321", cli_saldo: "50.50" }
-    ];
 
+    // _javascript/clientes.js
+    let modoEdicao = false;
+    let clienteIdEditando = null
+
+    //Elementos da interface
     const corpoTabela = document.getElementById('corpoTabelaClientes');
     const modal = document.getElementById('modalCliente');
     const formCliente = document.getElementById('formCliente');
     
     // Elementos de controle do modal
     const btnNovoCliente = document.getElementById('btnNovoCliente'); // Botão do topo para Insert
-    const btnExcluirModal = document.getElementById('btnExcluirModal');
     const btnCancelar = document.getElementById('btnCancelar');
     
     // Inputs
@@ -21,123 +18,181 @@ document.addEventListener('DOMContentLoaded', () => {
     const txtTelefone = document.getElementById('txtTelefone');
     const txtSaldo = document.getElementById('txtSaldo');
 
-    // --- RENDERIZAR GRID (SELECT) ---
-    function atualizarGrid() {
-        corpoTabela.innerHTML = '';
+    // --- FUNÇÃO PARA LISTAR (SELECT) ---
+    async function listarClientes() {
 
-        if (listaClientes.length === 0) {
-            corpoTabela.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px;">Nenhum cliente ativo encontrado.</td></tr>`;
+        try{
+            const response = await fetch('/api/clientes');
+            if (!response.ok) throw new Error('Erro ao buscar clientes');
+            const clientes = await response.json();
+
+            corpoTabela.innerHTML = '';
+
+            if (clientes.length === 0) {
+                corpoTabela.innerHTML = `<td><td colspan="5" style="text-align:center; padding:20px;">Nenhum cliente encontrado.</td></tr>`;
+            
             return;
+
         }
 
-        listaClientes.forEach(cliente => {
+        clientes.forEach(cliente => {
             const linha = document.createElement('tr');
 
-            linha.innerHTML = `
-                <td>${cliente.cli_id}</td>
-                <td>${cliente.cli_nome}</td>
-                <td>${cliente.cli_fone || 'Não informado'}</td>
-                <td>${Number(cliente.cli_saldo).toFixed(2)}</td>
-            `;
+            // ID
+            const tdId = document.createElement('td');
+            tdId.textContent = cliente.CLI_ID;
+            linha.appendChild(tdId);
 
-            // Coluna de ação contendo apenas o botão Editar
+            // Nome
+            const tdNome = document.createElement('td');
+            tdNome.textContent = cliente.CLI_NOME;
+            linha.appendChild(tdNome)
+
+            // Telefone
+            const tdTelefone = document.createElement('td');
+            tdTelefone.textContent = cliente.CLI_TELEFONE || 'Não informado';
+            linha.appendChild(tdTelefone);
+            
+            // Saldo
+            const tdSaldo = document.createElement('td');
+            tdSaldo.textContent = `R$ ${parseFloat(cliente.CLI_SALDO).toFixed(2)}`;
+            linha.appendChild(tdSaldo);
+
+            // Ações
             const tdAcoes = document.createElement('td');
             tdAcoes.className = 'coluna-acoes';
 
+            //EDITAR
             const btnEditar = document.createElement('button');
             btnEditar.textContent = 'Editar';
             btnEditar.className = 'btn-editar';
-            btnEditar.onclick = () => abrirModalEdicao(cliente.cli_id);
-            
+            btnEditar.onclick = () => editarCliente(cliente.CLI_ID);
             tdAcoes.appendChild(btnEditar);
+
+            //EXCLUIR
+            const btnExcluir = document.createElement('button');
+            btnExcluir.textContent = 'Excluir';
+            btnExcluir.className = 'btn-excluir';
+            btnExcluir.onclick = () => deletarCliente(cliente.CLI_ID);
+            tdAcoes.appendChild(btnExcluir);
+
             linha.appendChild(tdAcoes);
             corpoTabela.appendChild(linha);
         });
-    }
 
-    // --- GERENCIAMENTO DO MODAL ---
+    } catch (error) {
+        exibirMensagem(error.message, 'erro');
+    }
+}
+
     
-    // AÇÃO: Abrir modal para NOVO CADASTRO (INSERT)
-    if (btnNovoCliente) {
-        btnNovoCliente.onclick = function() {
-            fecharModal(); // Garante que o form comece limpo
-            
-            // Como é um novo cadastro, esconde o botão de excluir
-            btnExcluirModal.style.display = 'none'; 
-            
-            modal.classList.add('active');
-            txtNome.focus();
-        };
+    // Função para salvar ( insert / update )
+async function salvarCliente(event) {
+    event.preventDefault();
+
+    const nome = txtNome.value.trim();
+    const telefone = txtTelefone.value;
+    const saldo = parseFloat(txtSaldo.value) || 0;
+
+    if (!nome) {
+        exibirMensagem('O campo nome é obrigatório', 'erro');
+        return;
     }
 
-    // AÇÃO: Abrir modal para ALTERAR/REMOVER (UPDATE / DELETE)
-    function abrirModalEdicao(id) {
-        const cliente = listaClientes.find(c => c.cli_id === id);
-        if (cliente) {
-            // Preenche os campos do modal com os dados atuais
-            txtId.value = cliente.cli_id;
-            txtNome.value = cliente.cli_nome;
-            txtTelefone.value = cliente.cli_fone;
-            txtSaldo.value = cliente.cli_saldo;
-
-            // Como é edição, exibe o botão de excluir
-            btnExcluirModal.style.display = 'block'; 
-            
-            modal.classList.add('active');
-            txtNome.focus();
-        }
-    }
-
-    function fecharModal() {
-        modal.classList.remove('active');
-        formCliente.reset();
-        txtId.value = '';
-    }
-
-    // --- AÇÃO: SALVAR (Pode ser INSERT ou UPDATE) ---
-    formCliente.onsubmit = function(e) {
-        e.preventDefault();
-        const idAtual = txtId.value;
-
-        if (idAtual) {
-            // Se tem ID, executa a lógica de UPDATE
-            const cliente = listaClientes.find(c => c.cli_id == idAtual);
-            if (cliente) {
-                cliente.cli_nome = txtNome.value.toUpperCase();
-                cliente.cli_fone = txtTelefone.value;
-                cliente.cli_saldo = txtSaldo.value;
-            }
-        } else {
-            // Se NÃO tem ID, executa a lógica de INSERT (Novo Cliente)
-            // Gera um ID incremental fictício pegando o maior ID atual + 1
-            const novoId = listaClientes.length > 0 ? Math.max(...listaClientes.map(c => c.cli_id)) + 1 : 1;
-            
-            const novoCliente = {
-                cli_id: novoId,
-                cli_nome: txtNome.value.toUpperCase(),
-                cli_fone: txtTelefone.value,
-                cli_saldo: txtSaldo.value || "0.00"
-            };
-            listaClientes.push(novoCliente);
-        }
-
-        atualizarGrid();
-        fecharModal();
+    const dados = {
+        nome: nome.toUpperCase(),
+        telefone: telefone,
+        saldo: saldo
     };
 
-    // --- AÇÃO: EXCLUIR DENTRO DO MODAL (DELETE) ---
-    btnExcluirModal.onclick = function() {
-        const idAtual = Number(txtId.value);
-        if (idAtual && confirm("Tem certeza absoluta que deseja remover este cliente permanentemente?")) {
-            listaClientes = listaClientes.filter(c => c.cli_id !== idAtual);
-            atualizarGrid();
-            fecharModal();
+    let url = '/api/clientes';
+    let method = 'POST';
+
+    if (modoEdicao && clienteIdEditando) {
+        url = `/api/clientes/${clienteIdEditando}`;
+        method = 'PUT';
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+
+        if (!response.ok) {
+            const erro = await response.json();
+            throw new Error(erro.erro || 'Erro ao salvar');
+        }
+
+        exibirMensagem(modoEdicao ? 'Cliente atualizado!' : 'Cliente criado!', 'sucesso');
+        cancelarEdicao();
+        listarClientes();
+
+    } catch (error) {
+
+        exibirMensagem(error.message, 'erro');
+        }
+    }
+    window.editarCliente = async function(id) {
+        try {
+            const response = await fetch(`/api/clientes/${id}`);
+            if (!response.ok) throw new Error('Cliente não encontrado');
+            const cliente = await response.json();
+
+            txtId.value = cliente.CLI_ID;
+            txtNome.value = cliente.CLI_NOME;
+            txtTelefone.value = cliente.CLI_TELEFONE || '';
+            txtSaldo.value = cliente.CLI_SALDO;
+
+            modoEdicao = true;
+            clienteIdEditando = cliente.CLI_ID;
+            modal.classList.add('active');
+            txtNome.focus();
+        } catch (error) {
+            exibirMensagem('Erro ao carregar dados do cliente', 'erro');
         }
     };
+    // Função para deletar
+    window.deletarCliente = async function(id) {
+    if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
 
-    // Botão Voltar/Cancelar apenas fecha a janela
-    btnCancelar.onclick = fecharModal;
+    try {
+        const response = await fetch(`/api/clientes/${id}`, { method: 'DELETE' });
+        if (!response.ok) {
+            const erro = await response.json();
+            throw new Error(erro.erro || 'Erro ao excluir');
+        }
 
-    // Inicializa a listagem na tela
-    atualizarGrid();
-});
+        exibirMensagem('Cliente excluído com sucesso', 'sucesso');
+        listarClientes();
+
+        if (modoEdicao && clienteIdEditando === id) {
+            cancelarEdicao();
+        }
+    } catch (error) {
+        exibirMensagem(error.message, 'erro');
+    }
+};
+    // Função para cancelar 
+
+    function cancelarEdicao() {
+    modal.classList.remove('active');
+    formCliente.reset();
+    txtId.value = '';
+    modoEdicao = false;
+    clienteIdEditando = null;
+}
+   // Eventos
+   if (btnNovoCliente) {
+    btnNovoCliente.onclick = function() {
+        cancelarEdicao();
+        modal.classList.add('active');
+        txtNome.focus();
+    };
+}
+
+btnCancelar.onclick = cancelarEdicao;
+formCliente.onsubmit = salvarCliente;
+// Inicialização
+listarClientes();

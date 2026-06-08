@@ -1,21 +1,5 @@
-document.addEventListener('DOMContentLoaded', () => {
-
-    // BANCOS DE DADOS FICTÍCIOS (Mocks) para Clientes e Filmes
-    const dadosClientesMock = [
-        { cli_id: 1, cli_nome: "JOAO BATISTA" },
-        { cli_id: 2, cli_nome: "JOSE CARLOS" },
-        { cli_id: 3, cli_nome: "MARIA EDUARDA" }
-    ];
-
-    let dadosFilmesMock = [
-        { fil_id: 101, fil_nome: "MATRIX", estoque: 2, valor: 5.00 },
-        { fil_id: 102, fil_nome: "MATRIX RELOADED", estoque: 1, valor: 5.00 },
-        { fil_id: 103, fil_nome: "INTERESTELAR", estoque: 3, valor: 7.50 },
-        { fil_id: 104, fil_nome: "VINGADORES", estoque: 0, valor: 6.00 }
-    ];
-
-    // Array global para armazenar o histórico de locações
-    let historicoLocacoes = [];
+let contadorItens = 1;
+let filmesCache = [];
 
     // Elementos da Interface
     const formLocacao = document.getElementById('formLocacao');
@@ -27,167 +11,285 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnAdicionarItem = document.getElementById('btnAdicionarItem');
     const btnCancelarLocacao = document.getElementById('btnCancelarLocacao');
 
-    // ⚠️========================================================⚠️
-    // PROCESSOS INSERIDOS REORGANIZADOS E CORRIGIDOS
-    // ==========================================================
+   
+    // Função para carregar clientes
 
-    // --- BLOCO: preencher o select do novo item ---
-    function preencherSelectNovoItem(selectElement) {
-        selectElement.innerHTML = '<option value="">Escolha um filme...</option>';
+    async function carregarClientes() {
+        await preencherSelect('/api/clientes', 'selCliente', 'CLI_ID', 'CLI_NOME');
+}
+
+    // Função para carregar filmes
+
+async function carregarFilmes() {
+    try {
+        const response = await fetch('/api/filmes');
+        if (!response.ok) throw new Error('Erro ao buscar filmes');
+        filmesCache = await response.json();
+        atualizarSelectsFilmes();
+    } catch (error) {
+        exibirMensagem(error.message, 'erro');
+    }
+}
+
+    // Atualizar os selects de filmes
+
+function atualizarSelectsFilmes() {
+    const selects = containerItensLocacao.querySelectorAll('.select-filme-item');
+    selects.forEach(select => {
+        const valorAtual = select.value;
+        select.innerHTML = '<option value="">Selecione um filme...</option>';
         
-        dadosFilmesMock.forEach(filme => {
-            if (filme.estoque > 0) {
-                const opt = document.createElement('option');
-                opt.value = filme.fil_id;
-                opt.textContent = `${filme.fil_nome} (Qtd: ${filme.estoque}) - R$ ${filme.valor.toFixed(2)}`;
-                selectElement.appendChild(opt);
+        filmesCache.forEach(filme => {
+            if (filme.QUANTIDADE > 0) {
+                const option = document.createElement('option');
+                option.value = filme.FIL_ID;
+                option.textContent = `${filme.FIL_NOME} (estoque: ${filme.QUANTIDADE}) - R$ ${parseFloat(filme.ITN_VALOR_LOC || 10).toFixed(2)}`;
+                option.dataset.valor = filme.ITN_VALOR_LOC || 10;
+                select.appendChild(option);
             }
         });
-    }
+        
+        if (valorAtual) select.value = valorAtual;
+    });
+}
 
-    // --- BLOCO: adicionar novo item (filme) ao formulário ---
+    // Adicionar novo item ao formulário
+
     function adicionarNovoItemFilme() {
+        contadorItens++;
         const divLinha = document.createElement('div');
         divLinha.className = 'item-filme-linha';
+        divLinha.dataset.index = contadorItens;
 
         divLinha.innerHTML = `
             <div class="grupo-campo campo-grande">
                 <label>Filme para Locação:</label>
                 <select class="select-filme-item" required>
-                    </select>
+                    <option value="">Selecione um filme...</option>
+                </select>
+            </div>
+            <div class="grupo-campo">
+                <label>Valor da Locação (R$):</label>
+                <input type="number" step="0.01" class="input-valor-item" required>
             </div>
             <div class="grupo-campo">
                 <button type="button" class="btn-remover-item">Remover</button>
             </div>
         `;
 
-        const novoSelect = divLinha.querySelector('.select-filme-item');
-        preencherSelectNovoItem(novoSelect);
+    const selectFilme = divLinha.querySelector('.select-filme-item');
+    const inputValor = divLinha.querySelector('.input-valor-item');
 
-        divLinha.querySelector('.btn-remover-item').onclick = function() {
-            if (containerItensLocacao.querySelectorAll('.item-filme-linha').length > 1) {
-                divLinha.remove();
-            } else {
-                alert("A locação precisa conter pelo menos 1 filme!");
-            }
-        };
+   // Preencher o select com os filmes disponíveis
 
-        containerItensLocacao.appendChild(divLinha);
+    filmesCache.forEach(filme => {
+        if (filme.QUANTIDADE > 0) {
+            const option = document.createElement('option');
+            option.value = filme.FIL_ID;
+            option.textContent = `${filme.FIL_NOME} (estoque: ${filme.QUANTIDADE})`;
+            option.dataset.valor = filme.ITN_VALOR_LOC || 10;
+            selectFilme.appendChild(option);
+        }
+    });
+
+    // Preencher o valor padrão ao selecionar o filme 
+
+    selectFilme.onchange = function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption && selectedOption.dataset.valor) {
+            inputValor.value = selectedOption.dataset.valor;
+        }
+    };
+
+    // Botão de remoção
+
+    divLinha.querySelector('.btn-remover-item').onclick = function() {
+        if (containerItensLocacao.querySelectorAll('.item-filme-linha').length > 1) {
+            divLinha.remove();
+        } else {
+            exibirMensagem("A locação precisa conter pelo menos 1 filme!", 'erro');
+        }
+    };
+
+    containerItensLocacao.appendChild(divLinha);
+}
+
+    // Coletar dados do formulário 
+
+function coletarDadosFormulario() {
+    const clienteId = selCliente.value;
+    const dataLocacao = txtDataLocacao.value;
+    const itensLinhas = containerItensLocacao.querySelectorAll('.item-filme-linha');
+    
+    if (!clienteId) {
+        exibirMensagem('Selecione um cliente', 'erro');
+        return null;
     }
+    
+    if (!dataLocacao) {
+        exibirMensagem('Informe a data da locação', 'erro');
+        return null;
+    }
+    
+    const itens = [];
+    let itensValidos = true;
+    
+    itensLinhas.forEach(linha => {
+        const selectFilme = linha.querySelector('.select-filme-item');
+        const inputValor = linha.querySelector('.input-valor-item');
+        const filmeId = selectFilme.value;
+        const valor = inputValor.value;
+        
+        if (!filmeId) {
+            itensValidos = false;
+            return;
+        }
+        
+        itens.push({
+            filme_id: parseInt(filmeId),
+            valor: parseFloat(valor) || 0
+        });
+    });
+    
+    if (!itensValidos || itens.length === 0) {
+        exibirMensagem('Selecione um filme válido em cada linha', 'erro');
+        return null;
+    }
+    
+    return {
+        cliente_id: parseInt(clienteId),
+        itens: itens
+    };
+}
+    
+    // Registro e locação para o backend 
 
-    // --- BLOCO: carregar clientes e filmes ao iniciar página ---
-    function inicializarPagina() {
+async function registrarLocacao(event) {
+    event.preventDefault();
+    
+    const payload = coletarDadosFormulario();
+    if (!payload) return;
+    
+    try {
+        const response = await fetch('/api/locacoes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const resultado = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(resultado.erro || 'Erro ao registrar locação');
+        }
+        
+        exibirMensagem(`Locação registrada! Total: R$ ${resultado.valor_total}`, 'sucesso');
+        limparFormulario();
+        
+        // Recarrega filmes para atualizar estoque
+        await carregarFilmes();
+        
+    } catch (error) {
+        console.error('Erro:', error);
+        exibirMensagem(error.message, 'erro');
+    }
+}
+    // Limpa o formulário
+
+    // --- LIMPAR FORMULARIO ---
+function limparFormulario() {
+    // Limpa selects de filmes, mantendo apenas um item vazio
+    containerItensLocacao.innerHTML = '';
+    contadorItens = 1;
+    
+    // Adiciona um item inicial
+    const divLinha = document.createElement('div');
+    divLinha.className = 'item-filme-linha';
+    divLinha.dataset.index = 1;
+    divLinha.innerHTML = `
+        <div class="grupo-campo campo-grande">
+            <label>Filme para Locação:</label>
+            <select class="select-filme-item" required>
+                <option value="">Selecione um filme...</option>
+            </select>
+        </div>
+        <div class="grupo-campo">
+            <label>Valor da Locação (R$):</label>
+            <input type="number" step="0.01" class="input-valor-item" required>
+        </div>
+        <div class="grupo-campo">
+            <button type="button" class="btn-remover-item">Remover</button>
+        </div>
+    `;
+    containerItensLocacao.appendChild(divLinha);
+    
+    // Atualiza os selects com os filmes disponiveis
+    const selectFilme = divLinha.querySelector('.select-filme-item');
+    const inputValor = divLinha.querySelector('.input-valor-item');
+    
+    filmesCache.forEach(filme => {
+        if (filme.QUANTIDADE > 0) {
+            const option = document.createElement('option');
+            option.value = filme.FIL_ID;
+            option.textContent = `${filme.FIL_NOME} (estoque: ${filme.QUANTIDADE})`;
+            option.dataset.valor = filme.ITN_VALOR_LOC || 10;
+            selectFilme.appendChild(option);
+        }
+    });
+    
+    selectFilme.onchange = function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption && selectedOption.dataset.valor) {
+            inputValor.value = selectedOption.dataset.valor;
+        }
+    };
+    
+    divLinha.querySelector('.btn-remover-item').onclick = function() {
+        exibirMensagem("A locação precisa conter pelo menos 1 filme!", 'erro');
+    };
+    
+    // Reseta select de cliente e data
+    if (selCliente) selCliente.value = '';
+    if (txtDataLocacao) {
         const hoje = new Date().toISOString().split('T')[0];
         txtDataLocacao.value = hoje;
+    }
+}
 
-        selCliente.innerHTML = '<option value="">Selecione um cliente...</option>';
-        dadosClientesMock.forEach(cliente => {
-            const opt = document.createElement('option');
-            opt.value = cliente.cli_id;
-            opt.textContent = cliente.cli_nome;
-            selCliente.appendChild(opt);
-        });
+    // INICIALIZAÇÃO
 
-        containerItensLocacao.innerHTML = '';
-        adicionarNovoItemFilme();
+    async function inicializarPagina() {
+    await carregarClientes();
+    await carregarFilmes();
+    
+    // Data atual
+    if (txtDataLocacao) {
+        const hoje = new Date().toISOString().split('T')[0];
+        txtDataLocacao.value = hoje;
     }
 
-    // --- BLOCO: função para atualizar lista de filmes disponíveis (com estoque) ---
-    function atualizarTodosDropdownsFilmes() {
-        const todosSelects = containerItensLocacao.querySelectorAll('.select-filme-item');
-        
-        todosSelects.forEach(selectAtual => {
-            const valorSelecionado = selectAtual.value;
-            selectAtual.innerHTML = '<option value="">Escolha um filme...</option>';
-            
-            dadosFilmesMock.forEach(filme => {
-                if (filme.estoque > 0 || filme.fil_id == valorSelecionado) {
-                    const opt = document.createElement('option');
-                    opt.value = filme.fil_id;
-                    opt.textContent = `${filme.fil_nome} (Qtd: ${filme.estoque}) - R$ ${filme.valor.toFixed(2)}`;
-                    selectAtual.appendChild(opt);
-                }
-            });
-
-            selectAtual.value = valorSelecionado;
-        });
-    }
-
-    // --- BLOCO: coletar todos os itens do formulário com validação simples ---
-    function coletarDadosFormulario() {
-        const idCliente = selCliente.value;
-        const dataLocacao = txtDataLocacao.value;
-        const todosSelectsFilmes = containerItensLocacao.querySelectorAll('.select-filme-item');
-        
-        if (!idCliente || !dataLocacao) {
-            alert("Por favor, preencha o cliente e a data da locação!");
-            return null;
-        }
-
-        let filmesIdsSelecionados = [];
-        let validacaoItensOk = true;
-
-        todosSelectsFilmes.forEach(select => {
-            if (!select.value) {
-                validacaoItensOk = false;
-            } else {
-                filmesIdsSelecionados.push(Number(select.value));
-            }
-        });
-
-        if (!validacaoItensOk || filmesIdsSelecionados.length === 0) { // ➔ Corrigido aqui (filmesIdsSelecionados)
-            alert("Por favor, selecione um filme válido em cada linha adicionada!");
-            return null;
-        }
-
-        return {
-            loc_id: historicoLocacoes.length + 1,
-            cli_id: Number(idCliente),
-            loc_data: dataLocacao,
-            itens: filmesIdsSelecionados
+    limparFormulario();  // 
+    
+    // Configura eventos
+    if (btnAdicionarItem) {
+        btnAdicionarItem.onclick = function() {
+            adicionarNovoItemFilme();
         };
     }
-
-    // --- BLOCO: limpar o formulário e recarregar o estoque ---
-    function limparFormularioERecarregar() {
-        formLocacao.reset();
-        inicializarPagina();
-        atualizarTodosDropdownsFilmes();
-    }
-
-    // --- BLOCO: função para registrar a locação ---
-    formLocacao.onsubmit = function(event) {
-        event.preventDefault();
-
-        const payloadLocacao = coletarDadosFormulario();
-        if (!payloadLocacao) return; 
-
-        payloadLocacao.itens.forEach(idFilmeLocado => {
-            const filmeNoBanco = dadosFilmesMock.find(f => f.fil_id === idFilmeLocado);
-            if (filmeNoBanco && filmeNoBanco.estoque > 0) {
-                filmeNoBanco.estoque -= 1; 
+    
+    if (btnCancelarLocacao) {
+        btnCancelarLocacao.onclick = function() {
+            if (confirm("Tem certeza que deseja limpar todos os campos?")) {
+                limparFormulario();
             }
-        });
+        };
+    }
+    
+    if (formLocacao) {
+        formLocacao.onsubmit = registrarLocacao;
+    }
+}
+    // Inicia a pagina quando o DOM estiver carregado
 
-        historicoLocacoes.push(payloadLocacao);
-        alert("Locação registrada com sucesso com baixa realizada no estoque!");
-        limparFormularioERecarregar();
-    };
-
-    // --- CONFIGURAÇÃO DE EVENTOS COMPLEMENTARES ---
-    btnAdicionarItem.onclick = function() {
-        adicionarNovoItemFilme();
-        atualizarTodosDropdownsFilmes();
-    };
-
-    btnCancelarLocacao.onclick = function() {
-        if (confirm("Tem certeza que deseja limpar todos os campos preenchidos?")) {
-            limparFormularioERecarregar();
-        }
-    };
-
-    // Execução Automática Inicial
-    inicializarPagina();
-
+    document.addEventListener('DOMContentLoaded', inicializarPagina);
     //⚠️========================================================⚠️
-});

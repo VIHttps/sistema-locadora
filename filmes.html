@@ -36,12 +36,13 @@
                             <th>ID</th>
                             <th>Título</th>
                             <th>Categoria</th>
+                            <th>Estoque</th> 
                             <th class="coluna-acoes">Ações</th>
                         </tr>
                     </thead>
                     <tbody id="corpoTabelaFilmes">
                         <tr>
-                            <td colspan="4" class="placeholder-tabela">Carregando filmes...</td>
+                            <td colspan="5" class="placeholder-tabela">Carregando filmes...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -63,19 +64,25 @@
                 </div>
 
                 <div class="grupo-campo">
-                    <label for="selCategoria">Categoria (ID por enquanto):</label>
-                    <input type="number" id="selCategoria" name="selCategoria" placeholder="Ex: 1 para Ação, 2 para Drama" required>
+                    <label for="selCategoria">Categoria:</label>
+                    <select id="selCategoria" name="selCategoria" required>
+                    <option value="">Selecione uma categoria</option>
+                    </select>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="txtQuantidade">Quantidade em Estoque:</label>
+                    <input type="number" id="txtQuantidade" name="txtQuantidade" min="0" value="1" required>
                 </div>
 
                 <div class="modal-acoes">
                     <button type="submit" id="btnSalvar" class="btn-sucesso">Salvar Alterações</button>
-                    <button type="button" id="btnExcluirModal" class="btn-alerta">Excluir Filme</button>
                     <button type="button" id="btnCancelar" class="btn-neutro">Voltar</button>
                 </div>
             </form>
         </div>
     </div>
-
+    <script src="_javascript/util.js"></script>
     <script src="_javascript/filmes.js"></script>
 </body>
 </html>

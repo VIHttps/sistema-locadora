@@ -3,6 +3,7 @@
 // mysql2: conecta ao mysql
 const express = require('express');
 const mysql = require('mysql2/promise');
+const cors = require('cors');
 
 // carrega as variáveis do arquivo .env
 require('dotenv').config();
@@ -11,9 +12,10 @@ require('dotenv').config();
 const app = express();
 
 // define a porta onde o servidor vai rodar
-const port = process.env.PORT || 3300;
+const port = process.env.PORT || 3000;
 
 // middlewares para permitir a comunicacao correta entre a pagina, o js e o servidor
+app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
@@ -63,17 +65,17 @@ app.get('/api/clientes', async (req, res) => {
     }
 });
 
-// buscar um cliente especifico por id
+//Buscar cliente por ID
 app.get('/api/clientes/:id', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT * FROM clientes WHERE cli_id = ?', [req.params.id]);
         if (rows.length === 0) {
-            return res.status(404).json({ erro: 'cliente nao encontrado' });
+            return res.status(404).json({ erro: 'Cliente não encontrado' });
         }
         res.json(rows[0]);
     } catch (error) {
-        console.error('erro ao buscar cliente:', error);
-        res.status(500).json({ erro: 'erro interno do servidor' });
+        console.error('Erro ao buscar cliente:', error);
+        res.status(500).json({ erro: 'Erro interno do servidor' });
     }
 });
 
@@ -122,20 +124,27 @@ app.put('/api/clientes/:id', async (req, res) => {
     }
 });
 
-// deletar cliente (delete)
+// DELETAR cliente (DELETE)
 app.delete('/api/clientes/:id', async (req, res) => {
     const id = req.params.id;
-
+    
     try {
         const [result] = await pool.execute('DELETE FROM clientes WHERE cli_id = ?', [id]);
-
+        
         if (result.affectedRows === 0) {
-            return res.status(404).json({ erro: 'cliente nao encontrado' });
+            return res.status(404).json({ erro: 'Cliente não encontrado' });
         }
-        res.json({ mensagem: 'cliente deletado com sucesso' });
+        
+        res.json({ mensagem: 'Cliente deletado com sucesso' });
     } catch (error) {
-        console.error('erro ao deletar cliente:', error);
-        res.status(500).json({ erro: 'erro interno do servidor' });
+        console.error('Erro ao deletar cliente:', error);
+        
+        // Tratamento para cliente com locações vinculadas
+        if (error.code === 'ER_ROW_IS_REFERENCED' || error.code === 'ER_ROW_IS_REFERENCED_2') {
+            res.status(400).json({ erro: 'Não é possível excluir cliente com locações vinculadas' });
+        } else {
+            res.status(500).json({ erro: 'Erro interno do servidor' });
+        }
     }
 });
 
@@ -199,6 +208,24 @@ app.delete('/api/categorias/:id', async (req, res) => {
     } catch (error) {
         console.error('erro ao deletar categoria:', error);
         res.status(500).json({ erro: 'erro interno do servidor' });
+    }
+});
+
+// buscar por ID
+app.get('/api/categorias/:id', async (req, res) => {
+    const id = req.params.id;
+    
+    try {
+        const [rows] = await pool.query('SELECT * FROM categorias WHERE cat_id = ?', [id]);
+        
+        if (rows.length === 0) {
+            return res.status(404).json({ erro: 'Categoria não encontrada' });
+        }
+        
+        res.json(rows[0]);
+    } catch (error) {
+        console.error('Erro ao buscar categoria:', error);
+        res.status(500).json({ erro: 'Erro interno do servidor' });
     }
 });
 
@@ -281,16 +308,25 @@ app.delete('/api/filmes/:id', async (req, res) => {
 
     try {
         const [result] = await pool.execute('DELETE FROM filmes WHERE fil_id = ?', [id]);
+        
         if (result.affectedRows === 0) {
             return res.status(404).json({ erro: 'filme nao encontrado' });
         }
+        
         res.json({ mensagem: 'filme deletado com sucesso' });
     } catch (error) {
         console.error('erro ao deletar filme:', error);
-        res.status(500).json({ erro: 'erro interno do servidor' });
+        
+        // Tratamento para filme com itens de locação vinculados
+        if (error.code === 'ER_ROW_IS_REFERENCED' || error.code === 'ER_ROW_IS_REFERENCED_2') {
+            res.status(400).json({ 
+                erro: 'Não é possível excluir este filme pois ele possui locações vinculadas no histórico' 
+            });
+        } else {
+            res.status(500).json({ erro: 'erro interno do servidor' });
+        }
     }
 });
-
 // ==================== ROTA DE TRANSAÇÃO PARA LOCAÇÃO ====================
 
 // registrar uma nova locacao (insert com transacao e controle de estoque)
@@ -303,6 +339,30 @@ app.post('/api/locacoes', async (req, res) => {
     }
     if (!itens || !Array.isArray(itens) || itens.length === 0) {
         return res.status(400).json({ erro: 'nenhum item informado' });
+    }
+    // Busca o saldo atual do cliente no banco
+    const [clienteRows] = await pool.query(
+        'SELECT cli_saldo FROM clientes WHERE cli_id = ?',
+        [cliente_id]
+    );
+
+    if (clienteRows.length === 0) {
+        return res.status(404).json({ erro: 'cliente nao encontrado' });
+    }
+
+    const saldoAtual = parseFloat(clienteRows[0].cli_saldo);
+
+    // Calcula o valor total da locacao
+    let valorTotal = 0;
+    for (const item of itens) {
+        valorTotal += parseFloat(item.valor);
+    }
+
+    // Verifica se o saldo é suficiente
+    if (saldoAtual < valorTotal) {
+        return res.status(400).json({ 
+            erro: `Saldo insuficiente. Saldo atual: R$ ${saldoAtual.toFixed(2)}. Total da locacao: R$ ${valorTotal.toFixed(2)}` 
+        });
     }
 
     // obtem uma conexao dedicada para a transacao
@@ -351,6 +411,12 @@ app.post('/api/locacoes', async (req, res) => {
 
             valorTotal += parseFloat(item.valor);
         }
+
+// DESCONTA O VALOR TOTAL DO SALDO DO CLIENTE
+        await conn.execute(
+            'UPDATE clientes SET cli_saldo = cli_saldo - ? WHERE cli_id = ?',
+            [valorTotal, cliente_id]
+        );
 
         // confirma todas as alteracoes
         await conn.commit();
@@ -424,5 +490,3 @@ app.listen(port, () => {
     console.log(`abrir o navegador em: http://localhost:${port}`);
 });
 
-const cors = require('cors');
-app.use(cors());

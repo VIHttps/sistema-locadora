@@ -320,6 +320,20 @@ tbody tr:hover {
 .btn-editar:hover{
     background-color: #0c8db4;
 }
+.btn-excluir {
+    background-color: #0c8db4; 
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.btn-excluir:hover {
+    background-color: #0a7494; 
+}
 
 .btn-sucesso{ 
     width:auto;
