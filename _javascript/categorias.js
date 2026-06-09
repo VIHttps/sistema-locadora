@@ -1,6 +1,6 @@
 let modoEdicao = false;
 let categoriaIdEditando = null;
-
+// ==================== INTERFACE ====================
 
     // Elementos da Interface
     const corpoTabela = document.getElementById('corpoTabelaCategorias');
@@ -16,7 +16,8 @@ let categoriaIdEditando = null;
     const btnCancelar = document.getElementById('btnCancelar');
     
 
-    // --- FUNÇÃO PARA LISTAR ( SELECT ) ---
+// ==================== FUNÇÃO PARA LISTAR CATEGORIA ====================
+
     async function listarCategorias() {
     try {
         const response = await fetch('/api/categorias');
@@ -66,7 +67,9 @@ let categoriaIdEditando = null;
         exibirMensagem(error.message, 'erro');
     }
 }
-    // --- FUNÇÃO PARA SALVAR ( INSERIR, ATUALIZAR ) ---
+
+// ==================== FUNÇÃO PARA SALVAR CATEGORIA ( INSERT/ UPDATE)====================
+
 
    async function salvarCategoria(event) {
     event.preventDefault();
@@ -106,7 +109,8 @@ let categoriaIdEditando = null;
         exibirMensagem(error.message, 'erro');
     }
 }
-    // --- FUNÇÃO PARA EDITAR (PREENCHE O FORMULÁRIO) ---
+   // ==================== FUNÇÃO PARA EDITAR CATEGORIA ====================
+
     window.editarCategoria = async function(id) {
         console.log('ID recebido:', id);  
         try {
@@ -127,7 +131,9 @@ let categoriaIdEditando = null;
             exibirMensagem('Erro ao carregar dados da categoria', 'erro');
         }
 };
-    // --- FUNÇÃO PARA DELETAR ---
+
+ // ==================== FUNÇÃO PARA DELETAR CATEGORIA ====================
+
 window.deletarCategoria = async function(id) {
     if (!confirm('Tem certeza que deseja excluir esta categoria?')) return;
 
@@ -149,7 +155,8 @@ window.deletarCategoria = async function(id) {
     }
 };
 
-    // --- FUNÇÃO PARA CANCELAR EDIÇÃO ---
+// ==================== FUNÇÃO PARA CANCELAR EDIÇÃO ====================
+
    function cancelarEdicao() {
     modal.classList.remove('active');
     formCategoria.reset();
@@ -157,7 +164,7 @@ window.deletarCategoria = async function(id) {
     modoEdicao = false;
     categoriaIdEditando = null;
 }
-// Eventos
+// ==================== EVENTOS ====================
 
 if (btnNovaCategoria) {
     btnNovaCategoria.onclick = function() {
@@ -170,6 +177,5 @@ if (btnNovaCategoria) {
 btnCancelar.onclick = cancelarEdicao;
 formCategoria.onsubmit = salvarCategoria;
 
-// Inicializa
-
+ // ==================== INICIALIZAÇÃO ====================
 listarCategorias();

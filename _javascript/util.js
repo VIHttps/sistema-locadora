@@ -1,19 +1,8 @@
 // FUNÇÕES UTILITÁRIAS REUTILIZÁVEIS EM TODAS AS PÁGINAS.HTML
 // Centraliza funções repetitivas para evitar códigos duplicados
 
-//⚠️========================⚠️
-// PROCESSOS A SEREM INSERIDOS (AVALIAR POSSIBILIDADE DE SIMPLIFICAÇÃO)
-//  ========================
-//  bloco de código aqui para: função de sucesso ou erro ao usuário
-//  bloco de código aqui para: função para preencher um elemento <select> com opções vindas da API
-//  bloco de código aqui para: função para limpar um formulário pelos IDS dos campos ex:
-//  function limparFormulario(camposIds) {
-//  camposIds.forEach(id => { const campo = document.getElementById(id);...
-//⚠️========================⚠️
-// _javascript/utils.js
-// funcoes utilitarias reutilizaveis em todas as paginas
+// ==================== FUNÇÃO PARA EXIBIR MENSAGENS DE ERRO/ SUCESSO AO USUÁRIO ====================
 
-// funcao para exibir mensagens de sucesso ou erro ao usuario
 function exibirMensagem(mensagem, tipo) {
     // procura um elemento com id 'mensagem' na pagina
     const divMensagem = document.getElementById('mensagem');
@@ -30,6 +19,8 @@ function exibirMensagem(mensagem, tipo) {
         alert(mensagem);
     }
 }
+
+// ==================== PREENCHER UM ELEMENTO SELECT ====================
 
 // funcao para preencher um elemento select com dados vindos de uma api
 // url: endereco da api (ex: '/api/clientes')
@@ -65,13 +56,13 @@ function preencherSelect(url, selectId, valorId, textoId) {
         });
 }
 
-// funcao auxiliar para formatar valores monetarios
+// ==================== FUNÇÃO AUXILIAR PARA FORMATAR VALORES MONETÁRIOS ====================
 function formatarMoeda(valor) {
     if (valor === null || valor === undefined) return '';
     return 'r$ ' + Number(valor).toFixed(2).replace('.', ',');
 }
 
-// funcao auxiliar para escapar caracteres especiais (previne injecao)
+// ==================== FUNÇÃO PARA "ESCAPAR" CARACTERES ESPECIAIS ( PREVENÇÃO DE INJEÇÃO ) ( TESTE )====================
 function escapeHtml(texto) {
     if (!texto) return '';
     return texto

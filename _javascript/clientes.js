@@ -2,10 +2,11 @@
     // _javascript/clientes.js
     let modoEdicao = false;
     let clienteIdEditando = null
+    // ==================== INTERFACE ====================
 
     //Elementos da interface
-    const corpoTabela = document.getElementById('corpoTabelaClientes');
-    const modal = document.getElementById('modalCliente');
+    const corpoTabela = document.getElementById('corpoTabelaClientes'); // const = atribuição imutável
+    const modal = document.getElementById('modalCliente'); 
     const formCliente = document.getElementById('formCliente');
     
     // Elementos de controle do modal
@@ -18,8 +19,13 @@
     const txtTelefone = document.getElementById('txtTelefone');
     const txtSaldo = document.getElementById('txtSaldo');
 
-    // --- FUNÇÃO PARA LISTAR (SELECT) ---
-    async function listarClientes() {
+    // ==================== FUNÇÃO PARA LISTAR CLIENTES ( SELECT ) ====================
+
+    async function listarClientes() { //função assíncrona que retorna uma promise = promessa da disponibilidade de um valor no futuro
+        // ESTADOS DE UMA FUNÇÃO ASSÍNCRONA ( verificável pelo console )
+        // pending: em andamento
+        // fulfilled: terminou e gerou resultado
+        // rejected: falhou e há um erro
 
         try{
             const response = await fetch('/api/clientes');
@@ -85,8 +91,8 @@
     }
 }
 
-    
-    // Função para salvar ( insert / update )
+// ==================== FUNÇÃO PARA SALVAR CLIENTES ( INSERT/ UPDATE ) ====================
+
 async function salvarCliente(event) {
     event.preventDefault();
 
@@ -134,6 +140,9 @@ async function salvarCliente(event) {
         exibirMensagem(error.message, 'erro');
         }
     }
+
+    // ==================== EDITAR CLIENTES ====================
+
     window.editarCliente = async function(id) {
         try {
             const response = await fetch(`/api/clientes/${id}`);
@@ -153,7 +162,9 @@ async function salvarCliente(event) {
             exibirMensagem('Erro ao carregar dados do cliente', 'erro');
         }
     };
-    // Função para deletar
+    
+    // ==================== FUNÇÃO PARA DELETAR CLIENTES ( DELETE ) ====================
+
     window.deletarCliente = async function(id) {
     if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
 
@@ -174,7 +185,9 @@ async function salvarCliente(event) {
         exibirMensagem(error.message, 'erro');
     }
 };
-    // Função para cancelar 
+  
+// ==================== fUNÇÃO PARA CANCELAR EDIÇÃO ====================
+
 
     function cancelarEdicao() {
     modal.classList.remove('active');
@@ -183,7 +196,10 @@ async function salvarCliente(event) {
     modoEdicao = false;
     clienteIdEditando = null;
 }
-   // Eventos
+   
+// ==================== BOTÕES DE EVENTO ====================
+
+
    if (btnNovoCliente) {
     btnNovoCliente.onclick = function() {
         cancelarEdicao();
@@ -194,5 +210,7 @@ async function salvarCliente(event) {
 
 btnCancelar.onclick = cancelarEdicao;
 formCliente.onsubmit = salvarCliente;
-// Inicialização
+
+// ==================== INICIALIZAÇÃO ====================
+
 listarClientes();

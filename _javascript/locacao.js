@@ -1,5 +1,6 @@
 let contadorItens = 1;
 let filmesCache = [];
+// ==================== INTERFACE ====================
 
     // Elementos da Interface
     const formLocacao = document.getElementById('formLocacao');
@@ -12,13 +13,14 @@ let filmesCache = [];
     const btnCancelarLocacao = document.getElementById('btnCancelarLocacao');
 
    
-    // Função para carregar clientes
+// ==================== FUNÇÃO PARA CARREGAR CLIENTES ====================
 
     async function carregarClientes() {
         await preencherSelect('/api/clientes', 'selCliente', 'CLI_ID', 'CLI_NOME');
 }
 
-    // Função para carregar filmes
+// ==================== FUNÇÃO PARA CARREGAR FILMES  ====================
+
 
 async function carregarFilmes() {
     try {
@@ -31,7 +33,7 @@ async function carregarFilmes() {
     }
 }
 
-    // Atualizar os selects de filmes
+// ==================== ATUALIZAR O SELECT DE FILMES ====================
 
 function atualizarSelectsFilmes() {
     const selects = containerItensLocacao.querySelectorAll('.select-filme-item');
@@ -53,7 +55,7 @@ function atualizarSelectsFilmes() {
     });
 }
 
-    // Adicionar novo item ao formulário
+// ==================== ADICIONAR NOVO FILME AO FORMULÁRIO ====================
 
     function adicionarNovoItemFilme() {
         contadorItens++;
@@ -80,7 +82,7 @@ function atualizarSelectsFilmes() {
     const selectFilme = divLinha.querySelector('.select-filme-item');
     const inputValor = divLinha.querySelector('.input-valor-item');
 
-   // Preencher o select com os filmes disponíveis
+// ==================== PREENCHER O SELECT COM OS FILMES DISPONÍVEIS ====================
 
     filmesCache.forEach(filme => {
         if (filme.QUANTIDADE > 0) {
@@ -92,7 +94,7 @@ function atualizarSelectsFilmes() {
         }
     });
 
-    // Preencher o valor padrão ao selecionar o filme 
+// ==================== PREENCHIMENTO DE VALOR AO ADICIONAR FILME ====================
 
     selectFilme.onchange = function() {
         const selectedOption = this.options[this.selectedIndex];
@@ -101,7 +103,7 @@ function atualizarSelectsFilmes() {
         }
     };
 
-    // Botão de remoção
+ // ==================== BOTÃO DE REMOÇÃO ====================
 
     divLinha.querySelector('.btn-remover-item').onclick = function() {
         if (containerItensLocacao.querySelectorAll('.item-filme-linha').length > 1) {
@@ -114,7 +116,7 @@ function atualizarSelectsFilmes() {
     containerItensLocacao.appendChild(divLinha);
 }
 
-    // Coletar dados do formulário 
+// ==================== COLETAR DADOS DO FORMULÁRIO ====================
 
 function coletarDadosFormulario() {
     const clienteId = selCliente.value;
@@ -162,7 +164,7 @@ function coletarDadosFormulario() {
     };
 }
     
-    // Registro e locação para o backend 
+// ==================== REGISTRO E LOCAÇÃO PARA O BACKEND ====================
 
 async function registrarLocacao(event) {
     event.preventDefault();
@@ -194,11 +196,12 @@ async function registrarLocacao(event) {
         exibirMensagem(error.message, 'erro');
     }
 }
-    // Limpa o formulário
 
-    // --- LIMPAR FORMULARIO ---
+// ==================== FUNÇÃO PARA LIMPAR O FORMULÁRIO ====================
+
 function limparFormulario() {
     // Limpa selects de filmes, mantendo apenas um item vazio
+
     containerItensLocacao.innerHTML = '';
     contadorItens = 1;
     
@@ -256,7 +259,7 @@ function limparFormulario() {
     }
 }
 
-    // INICIALIZAÇÃO
+// ==================== INICIALIZAÇÃO ====================
 
     async function inicializarPagina() {
     await carregarClientes();
@@ -268,9 +271,10 @@ function limparFormulario() {
         txtDataLocacao.value = hoje;
     }
 
-    limparFormulario();  // 
+    limparFormulario();   
     
-    // Configura eventos
+// ==================== CONFIGURAÇÃO DOS EVENTOS ====================
+
     if (btnAdicionarItem) {
         btnAdicionarItem.onclick = function() {
             adicionarNovoItemFilme();
@@ -289,7 +293,8 @@ function limparFormulario() {
         formLocacao.onsubmit = registrarLocacao;
     }
 }
-    // Inicia a pagina quando o DOM estiver carregado
+    
+// ==================== INICIALIZAÇÃO DA PÁGINA APÓS CARREGAMENTO DO DOM ====================
 
     document.addEventListener('DOMContentLoaded', inicializarPagina);
-    //⚠️========================================================⚠️
+    

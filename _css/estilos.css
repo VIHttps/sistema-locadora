@@ -1,20 +1,4 @@
-/* ESTILOS GLOBAIS
-
-
-
-/*⚠️========================⚠️ 
-/* MODIFICAR ( OBRIGATÓRIO ) :
-/*=========================== 
-/* Padrão com formulário na parte superior e grid na parte inferior
-/*⚠️========================⚠️ 
-
-
-/*⚠️========================⚠️ 
-/* MODIFICAR ( OPCIONAL ) :
-=============================
-/* Refinar o CSS para uma aparência mais amigável e intuitiva, ainda em coesão com o Backend
-/*⚠️========================⚠️ 
-        
+/*==================== ESTILOS GLOBAIS ====================
 
 /* body: seleciona o corpo da página */
 /* font-family: define a fonte do texto */
@@ -110,7 +94,7 @@ header h1 {
 
 .menu-principal a.active {
     color: #ffffff;
-    background-color: #0c8db4; /* Destaque em Vermelho */
+    background-color: #0c8db4; 
 }
 
 .menu-principal a.destaque {
@@ -245,9 +229,9 @@ tbody tr:hover {
     animation: abrirModal 0.3s ease;
 }
 
-@keyframes abrirModal {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+@keyframes abrirModal { /* "@" : regras de comportamento de um bloco css, nesse caso, interpolação de frames*/
+    from { transform: translateY(-20px); opacity: 0; } /* estado inicial */
+    to { transform: translateY(0); opacity: 1; } /* estado final */
 }
 
 .modal-container h3 {
@@ -283,10 +267,10 @@ tbody tr:hover {
     font-size: 14px;
 }
 
-/* Botões alinhados na base do Modal */
+/* Alinhamento na base do modal */
 .modal-acoes {
     display: flex;
-    flex-direction: column; /* Botões empilhados para melhor clique */
+    flex-direction: column;
     gap: 10px;
     margin-top: 20px;
 }
@@ -341,9 +325,7 @@ tbody tr:hover {
     margin-top: 20px;
 }
 
-/* ==========================================================================
-   ESTILOS EXCLUSIVOS DA TELA DE NOVA LOCAÇÃO
-   ========================================================================== */
+/* ==================== ESTILOS DA TABELA DE NOVA LOCAÇÃO ==================== */
 
 .secao-cadastro-locacao {
     background-color: #ffffff;

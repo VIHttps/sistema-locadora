@@ -1,4 +1,6 @@
-// _javascript/scripts.js
+// BUSCAR DADOS DA API E PREENCHER DINAMICAMENTE A TABELA NA PÁGINA QUANDO O BOTÃO É CLICADO
+// (funciona em index.html)
+
 // funcao executada quando o botao e clicado
 document.getElementById('btnBuscar').onclick = function() {
     // faz requisicao ao backend e retorna uma Promise

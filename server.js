@@ -19,16 +19,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Middleware para liberar o CORS (Evita o erro de bloqueio no fetch do navegador)
+// middleware para liberar o CORS (Evita o erro de bloqueio no fetch do navegador)
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Origin", "*");// parâmetros da resposta
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
     next();
 });
 
 // pool de conexoes com o banco de dados
-// utilizar pool em vez de createConnection e a melhor pratica para aplicacoes web
 // waitForConnections: aguarda se todas as conexoes estiverem ocupadas
 // connectionLimit: numero maximo de conexoes simultaneas
 // queueLimit: tamanho maximo da fila de espera (0 = ilimitado)
@@ -54,7 +53,7 @@ pool.getConnection()
 
 // ==================== ROTAS PARA CLIENTES ====================
 
-// listar todos os clientes (select)
+// LISTAR TODOS OS CLIENTES ( SELECT )
 app.get('/api/clientes', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT * FROM clientes ORDER BY cli_id');
@@ -65,7 +64,7 @@ app.get('/api/clientes', async (req, res) => {
     }
 });
 
-//Buscar cliente por ID
+// BUSCAR CLIENTE POR ID
 app.get('/api/clientes/:id', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT * FROM clientes WHERE cli_id = ?', [req.params.id]);
@@ -79,7 +78,7 @@ app.get('/api/clientes/:id', async (req, res) => {
     }
 });
 
-// inserir novo cliente (insert)
+// INSERIR NOVO CLIENTE ( INSERT )
 // validacao: campo nome e obrigatorio
 app.post('/api/clientes', async (req, res) => {
     const { nome, telefone, saldo } = req.body;
@@ -103,7 +102,7 @@ app.post('/api/clientes', async (req, res) => {
     }
 });
 
-// atualizar cliente (update)
+// ATUALIZAR CLIENTE ( UPDATE )
 app.put('/api/clientes/:id', async (req, res) => {
     const id = req.params.id;
     const { nome, telefone, saldo } = req.body;
@@ -124,7 +123,7 @@ app.put('/api/clientes/:id', async (req, res) => {
     }
 });
 
-// DELETAR cliente (DELETE)
+// DELETAR CLIENTE ( DELETE )
 app.delete('/api/clientes/:id', async (req, res) => {
     const id = req.params.id;
     
@@ -150,7 +149,7 @@ app.delete('/api/clientes/:id', async (req, res) => {
 
 // ==================== ROTAS PARA CATEGORIAS ====================
 
-// listar todas as categorias (select)
+// LISTAR TODAS AS CATEGORIAS ( SELECT )
 app.get('/api/categorias', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT * FROM categorias ORDER BY cat_id');
@@ -161,7 +160,7 @@ app.get('/api/categorias', async (req, res) => {
     }
 });
 
-// inserir nova categoria (insert)
+// INSERIR NOVA CATEGORIA ( INSERT )
 app.post('/api/categorias', async (req, res) => {
     const { nome } = req.body;
 
@@ -178,7 +177,7 @@ app.post('/api/categorias', async (req, res) => {
     }
 });
 
-// atualizar categoria (update)
+// ATUALIZAR CATEGORIA ( UPDATE )
 app.put('/api/categorias/:id', async (req, res) => {
     const id = req.params.id;
     const { nome } = req.body;
@@ -195,7 +194,7 @@ app.put('/api/categorias/:id', async (req, res) => {
     }
 });
 
-// deletar categoria (delete)
+// DELETAR CATEGORIA ( DELETE )
 app.delete('/api/categorias/:id', async (req, res) => {
     const id = req.params.id;
 
@@ -211,7 +210,7 @@ app.delete('/api/categorias/:id', async (req, res) => {
     }
 });
 
-// buscar por ID
+// BUSCAR ID 
 app.get('/api/categorias/:id', async (req, res) => {
     const id = req.params.id;
     
@@ -231,7 +230,7 @@ app.get('/api/categorias/:id', async (req, res) => {
 
 // ==================== ROTAS PARA FILMES ====================
 
-// listar todos os filmes (select) com nome da categoria via left join
+// LISTAR TODOS OS FILMES: select com nome da categoria via left join
 app.get('/api/filmes', async (req, res) => {
     try {
         const [rows] = await pool.query(`
@@ -247,7 +246,7 @@ app.get('/api/filmes', async (req, res) => {
     }
 });
 
-// buscar um filme especifico por id
+// BUSCAR FILME ESPECÍFICO PELO ID
 app.get('/api/filmes/:id', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT * FROM filmes WHERE fil_id = ?', [req.params.id]);
@@ -261,7 +260,7 @@ app.get('/api/filmes/:id', async (req, res) => {
     }
 });
 
-// inserir novo filme (insert)
+// INSERIR NOVO FILME ( INSERT )
 // validacao: campo nome e obrigatorio, categoria_id e opcional (pode ser null)
 app.post('/api/filmes', async (req, res) => {
     const { nome, categoria_id, quantidade } = req.body;
@@ -282,7 +281,7 @@ app.post('/api/filmes', async (req, res) => {
     }
 });
 
-// atualizar filme (update)
+// ATUALIZAR FILME ( UPDATE )
 app.put('/api/filmes/:id', async (req, res) => {
     const id = req.params.id;
     const { nome, categoria_id, quantidade } = req.body;
@@ -302,7 +301,7 @@ app.put('/api/filmes/:id', async (req, res) => {
     }
 });
 
-// deletar filme (delete)
+// DELETAR FILME ( DELETE )
 app.delete('/api/filmes/:id', async (req, res) => {
     const id = req.params.id;
 
@@ -329,7 +328,7 @@ app.delete('/api/filmes/:id', async (req, res) => {
 });
 // ==================== ROTA DE TRANSAÇÃO PARA LOCAÇÃO ====================
 
-// registrar uma nova locacao (insert com transacao e controle de estoque)
+//  REGISTRAR UMA NOVA LOCAÇÃO : insert com transacao e controle de estoque
 app.post('/api/locacoes', async (req, res) => {
     const { cliente_id, itens } = req.body;
 
@@ -412,7 +411,7 @@ app.post('/api/locacoes', async (req, res) => {
             valorTotal += parseFloat(item.valor);
         }
 
-// DESCONTA O VALOR TOTAL DO SALDO DO CLIENTE
+// desconta o valor total do saldo do cliente
         await conn.execute(
             'UPDATE clientes SET cli_saldo = cli_saldo - ? WHERE cli_id = ?',
             [valorTotal, cliente_id]
@@ -438,14 +437,15 @@ app.post('/api/locacoes', async (req, res) => {
             res.status(500).json({ erro: 'erro interno ao processar locacao' });
         }
     } finally {
-        // libera a conexao de volta ao pool
+
+    // libera a conexao de volta ao pool
         conn.release();
     }
 });
 
 // ==================== ROTA DE CONSULTA DE LOCAÇÕES (JOIN) ====================
 
-// consulta de locacoes com join entre cinco tabelas
+// CONSULTA DE LOCAÇÕES: join entre cinco tabelas
 // conforme exemplo da aula 11 pagina 15
 app.get('/api/locacoes', async (req, res) => {
     try {

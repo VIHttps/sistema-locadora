@@ -1,6 +1,7 @@
-// _javascript/filmes.js
+
 let modoEdicao = false;
 let filmeIdEditando = null;
+// ==================== INTERFACE ====================
 
 // Elementos da Interface
 const corpoTabela = document.getElementById('corpoTabelaFilmes');
@@ -18,7 +19,7 @@ const btnNovoFilme = document.getElementById('btnNovoFilme');
 const btnExcluirModal = document.getElementById('btnExcluirModal');
 const btnCancelar = document.getElementById('btnCancelar');
 
-// --- FUNÇÃO PARA LISTAR (SELECT) ---
+// ==================== FUNÇÃO PARA LISTAR ( SELECT ) ====================
 async function listarFilmes() {
     try {
         const response = await fetch('/api/filmes');
@@ -75,7 +76,8 @@ async function listarFilmes() {
     }
 }
 
-// --- FUNÇÃO PARA SALVAR (INSERT / UPDATE) ---
+// ==================== FUNÇÃO PARA SALVAR ( INSERT/ UPDATE )====================
+
 async function salvarFilme(event) {
     event.preventDefault();
 
@@ -125,7 +127,8 @@ async function salvarFilme(event) {
     }
 }
 
-// --- FUNÇÃO PARA EDITAR ---
+// ==================== FUNÇÃO PARA EDITAR ====================
+
 window.editarFilme = async function(id) {
     console.log('1 - ID recebido:', id);
     try {
@@ -147,7 +150,8 @@ window.editarFilme = async function(id) {
     }
 };
 
-// --- FUNÇÃO PARA DELETAR ---
+// ==================== FUNÇÃO PARA DELETAR ====================
+
 window.deletarFilme = async function(id) {  // *
     if (!confirm('Tem certeza que deseja excluir este filme?')) return;
 
@@ -169,7 +173,7 @@ window.deletarFilme = async function(id) {  // *
     }
 };
 
-// --- FUNÇÃO PARA CANCELAR EDIÇÃO ---
+// ==================== FUNÇÃO PARA CANCELAR EDIÇÃO ====================
 function cancelarEdicao() {
     modal.classList.remove('active');
     formFilme.reset();
@@ -179,7 +183,8 @@ function cancelarEdicao() {
     txtQuantidade.value = 1;
 }
 
-// --- EVENTOS ---
+// ==================== BOTÕES DE EVENTO ====================
+
 if (btnNovoFilme) {
     btnNovoFilme.onclick = function() {
         cancelarEdicao();
@@ -191,6 +196,7 @@ if (btnNovoFilme) {
 btnCancelar.onclick = cancelarEdicao;
 formFilme.onsubmit = salvarFilme;
 
-// --- INICIALIZAÇÃO ---
+// ==================== INICIALIZAÇÃO ====================
+
 preencherSelect('/api/categorias', 'selCategoria', 'CAT_ID', 'CAT_NOME');
 listarFilmes();
