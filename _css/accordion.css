@@ -1,0 +1,120 @@
+
+/* estilos para a visualizacao em acordeao das locacoes por cliente */
+
+/* container principal do acordeao */
+.accordion {
+    margin-top: 20px;
+}
+
+/* cada bloco de cliente (item do acordeao) */
+.accordion-item {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* cabecalho do acordeao (dados do cliente) - sempre visivel */
+.accordion-header {
+    background-color: #1a1a1a;
+    color: white;
+    padding: 15px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.accordion-header:hover {
+    background-color: #0c8db4;
+}
+
+/* seta indicadora de que e clicavel */
+.accordion-header::after {
+    content: '▼';
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+/* quando aberto, a seta aponta para cima */
+.accordion-item.active .accordion-header::after {
+    transform: rotate(180deg);
+}
+
+/* conteudo do acordeao (tabela de filmes) - inicialmente escondido */
+.accordion-content {
+    display: none;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+}
+
+/* exibe o conteudo quando o item tem a classe 'active' */
+.accordion-item.active .accordion-content {
+    display: block;
+}
+
+/* subtabela de filmes dentro do acordeao */
+.inner-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.inner-table th,
+.inner-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.inner-table th {
+    background-color: #0c8db4;
+    color: white;
+}
+
+/* botao de registrar devolucao */
+.btn-devolver {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* botao para excluir locacao inteira */
+.btn-excluir-locacao {
+    background-color: #131313;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.btn-excluir-locacao:hover {
+    background-color: #c82333;
+}
+
+.btn-devolver:hover {
+    background-color: #218838;
+}
+
+/* status do item (alugado/devolvido) */
+.status-cell {
+    font-weight: bold;
+}
+
+.status-alugado {
+    color: #dc3545;
+}
+
+.status-devolvido {
+    color: #28a745;
+}

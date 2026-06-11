@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Locadora - Consultar Locações</title>
+    <link rel="stylesheet" href="_css/estilos.css">
+    <link rel="stylesheet" href="_css/accordion.css">
+</head>
+<body>
+
+    <header>
+        <h1> Mega Filmes<span id="locadora"> DVDs</span></h1>
+        
+        <nav class="menu-principal">
+            <a href="index.html">Início</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="filmes.html">Filmes</a>
+            <a href="categorias.html">Categorias</a>
+            <a href="consultar_locacoes.html" class="active">Consultar Locações</a>
+            <a href="locacao.html" class="destaque">Nova Locação ➔</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="secao-consultas">
+            <h2>Locações por Cliente</h2>
+            <p>Clique em "Carregar Locações" para visualizar os dados</p>
+            <p>Ao clicar no cabeçalho do cliente para expandir você poderá ver os filmes locados</p>
+            
+
+            <div class="acoes-consulta">
+                <button id="btnCarregar" class="btn-sucesso">Carregar Locações</button>
+            </div>
+            
+            <div id="accordionContainer" class="accordion">
+                
+            </div>
+        </section>
+    </main>
+
+    <div id="mensagem"></div>
+
+    <script src="_javascript/util.js"></script>
+    <script src="_javascript/accordion.js"></script>
+</body>
+</html>

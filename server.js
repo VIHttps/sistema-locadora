@@ -19,14 +19,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// middleware para liberar o CORS (Evita o erro de bloqueio no fetch do navegador)
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");// parâmetros da resposta
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-    next();
-});
-
 // pool de conexoes com o banco de dados
 // waitForConnections: aguarda se todas as conexoes estiverem ocupadas
 // connectionLimit: numero maximo de conexoes simultaneas
@@ -54,9 +46,10 @@ pool.getConnection()
 // ==================== ROTAS PARA CLIENTES ====================
 
 // LISTAR TODOS OS CLIENTES ( SELECT )
+
 app.get('/api/clientes', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM clientes ORDER BY cli_id');
+        const [rows] = await pool.query('SELECT * FROM clientes ORDER BY cli_nome ASC');
         res.json(rows);
     } catch (error) {
         console.error('erro ao listar clientes:', error);
@@ -124,10 +117,24 @@ app.put('/api/clientes/:id', async (req, res) => {
 });
 
 // DELETAR CLIENTE ( DELETE )
+// verifica se o cliente possui locacoes antes de permitir a exclusao
+// impede a exclusao de clientes que ja realizaram locacoes
 app.delete('/api/clientes/:id', async (req, res) => {
     const id = req.params.id;
     
     try {
+        // verifica se o cliente possui locacoes registradas
+        const [locacoesVinculadas] = await pool.query(
+            'SELECT COUNT(*) as total FROM locacoes WHERE loc_cli_id = ?',
+            [id]
+        );
+        
+        if (locacoesVinculadas[0].total > 0) {
+            return res.status(400).json({ 
+                erro: 'Não é possível excluir este cliente pois ele possui histórico de locações'
+            });
+        }
+        
         const [result] = await pool.execute('DELETE FROM clientes WHERE cli_id = ?', [id]);
         
         if (result.affectedRows === 0) {
@@ -138,7 +145,7 @@ app.delete('/api/clientes/:id', async (req, res) => {
     } catch (error) {
         console.error('Erro ao deletar cliente:', error);
         
-        // Tratamento para cliente com locações vinculadas
+        // tratamento para cliente com locacoes vinculadas (fallback para erro de chave estrangeira)
         if (error.code === 'ER_ROW_IS_REFERENCED' || error.code === 'ER_ROW_IS_REFERENCED_2') {
             res.status(400).json({ erro: 'Não é possível excluir cliente com locações vinculadas' });
         } else {
@@ -146,13 +153,13 @@ app.delete('/api/clientes/:id', async (req, res) => {
         }
     }
 });
-
 // ==================== ROTAS PARA CATEGORIAS ====================
 
 // LISTAR TODAS AS CATEGORIAS ( SELECT )
+
 app.get('/api/categorias', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM categorias ORDER BY cat_id');
+        const [rows] = await pool.query('SELECT * FROM categorias ORDER BY cat_nome ASC');
         res.json(rows);
     } catch (error) {
         console.error('erro ao listar categorias:', error);
@@ -195,21 +202,36 @@ app.put('/api/categorias/:id', async (req, res) => {
 });
 
 // DELETAR CATEGORIA ( DELETE )
+// verifica se a categoria possui filmes vinculados antes de permitir a exclusao
+// impede a exclusao de categorias que estao sendo utilizadas
 app.delete('/api/categorias/:id', async (req, res) => {
     const id = req.params.id;
 
     try {
-        const [result] = await pool.execute('DELETE FROM categorias WHERE cat_id = ?', [id]);
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ erro: 'categoria nao encontrada' });
+        // verifica se a categoria possui filmes vinculados
+        const [filmesVinculados] = await pool.query(
+            'SELECT COUNT(*) as total FROM filmes WHERE fil_cat_id = ?',
+            [id]
+        );
+        
+        if (filmesVinculados[0].total > 0) {
+            return res.status(400).json({ 
+                erro: 'Não é possível excluir esta categoria pois existem filmes vinculados a ela'
+            });
         }
-        res.json({ mensagem: 'categoria deletada com sucesso' });
+        
+        const [result] = await pool.execute('DELETE FROM categorias WHERE cat_id = ?', [id]);
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Categoria não encontrada' });
+        }
+        
+        res.json({ mensagem: 'Categoria deletada com sucesso' });
     } catch (error) {
         console.error('erro ao deletar categoria:', error);
-        res.status(500).json({ erro: 'erro interno do servidor' });
+        res.status(500).json({ erro: 'Erro interno do servidor' });
     }
 });
-
 // BUSCAR ID 
 app.get('/api/categorias/:id', async (req, res) => {
     const id = req.params.id;
@@ -231,13 +253,14 @@ app.get('/api/categorias/:id', async (req, res) => {
 // ==================== ROTAS PARA FILMES ====================
 
 // LISTAR TODOS OS FILMES: select com nome da categoria via left join
+
 app.get('/api/filmes', async (req, res) => {
     try {
         const [rows] = await pool.query(`
             SELECT f.*, c.cat_nome 
             FROM filmes f
             LEFT JOIN categorias c ON f.fil_cat_id = c.cat_id
-            ORDER BY f.fil_id
+            ORDER BY f.fil_nome ASC
         `);
         res.json(rows);
     } catch (error) {
@@ -300,30 +323,35 @@ app.put('/api/filmes/:id', async (req, res) => {
         res.status(500).json({ erro: 'erro interno do servidor' });
     }
 });
-
 // DELETAR FILME ( DELETE )
+// verifica se o filme possui itens de locacao antes de permitir a exclusao
+// impede a exclusao de filmes que ja foram alugados (preserva historico)
 app.delete('/api/filmes/:id', async (req, res) => {
     const id = req.params.id;
 
     try {
+        // verifica se o filme possui itens de locacao (foi alugado alguma vez)
+        const [itensVinculados] = await pool.query(
+            'SELECT COUNT(*) as total FROM itens WHERE itn_fil_id = ?',
+            [id]
+        );
+        
+        if (itensVinculados[0].total > 0) {
+            return res.status(400).json({ 
+                erro: 'Não é possível excluir este filme pois ele possui histórico de locações'
+            });
+        }
+        
         const [result] = await pool.execute('DELETE FROM filmes WHERE fil_id = ?', [id]);
         
         if (result.affectedRows === 0) {
-            return res.status(404).json({ erro: 'filme nao encontrado' });
+            return res.status(404).json({ erro: 'Filme não encontrado' });
         }
         
-        res.json({ mensagem: 'filme deletado com sucesso' });
+        res.json({ mensagem: 'Filme deletado com sucesso' });
     } catch (error) {
         console.error('erro ao deletar filme:', error);
-        
-        // Tratamento para filme com itens de locação vinculados
-        if (error.code === 'ER_ROW_IS_REFERENCED' || error.code === 'ER_ROW_IS_REFERENCED_2') {
-            res.status(400).json({ 
-                erro: 'Não é possível excluir este filme pois ele possui locações vinculadas no histórico' 
-            });
-        } else {
-            res.status(500).json({ erro: 'erro interno do servidor' });
-        }
+        res.status(500).json({ erro: 'Erro interno do servidor' });
     }
 });
 // ==================== ROTA DE TRANSAÇÃO PARA LOCAÇÃO ====================
@@ -339,31 +367,30 @@ app.post('/api/locacoes', async (req, res) => {
     if (!itens || !Array.isArray(itens) || itens.length === 0) {
         return res.status(400).json({ erro: 'nenhum item informado' });
     }
-    // Busca o saldo atual do cliente no banco
-    const [clienteRows] = await pool.query(
-        'SELECT cli_saldo FROM clientes WHERE cli_id = ?',
-        [cliente_id]
-    );
+  // Busca o saldo atual do cliente no banco
+const [clienteRows] = await pool.query(
+    'SELECT cli_saldo FROM clientes WHERE cli_id = ?',
+    [cliente_id]
+);
 
-    if (clienteRows.length === 0) {
-        return res.status(404).json({ erro: 'cliente nao encontrado' });
-    }
+if (clienteRows.length === 0) {
+    return res.status(404).json({ erro: 'cliente nao encontrado' });
+}
 
-    const saldoAtual = parseFloat(clienteRows[0].cli_saldo);
+const saldoAtual = parseFloat(clienteRows[0].cli_saldo);
 
-    // Calcula o valor total da locacao
-    let valorTotal = 0;
-    for (const item of itens) {
-        valorTotal += parseFloat(item.valor);
-    }
+// Calcula o valor total da locacao
+let valorTotal = 0;  // 
+for (const item of itens) {
+    valorTotal += parseFloat(item.valor);
+}
 
-    // Verifica se o saldo é suficiente
-    if (saldoAtual < valorTotal) {
-        return res.status(400).json({ 
-            erro: `Saldo insuficiente. Saldo atual: R$ ${saldoAtual.toFixed(2)}. Total da locacao: R$ ${valorTotal.toFixed(2)}` 
-        });
-    }
-
+// Verifica se o saldo é suficiente
+if (saldoAtual < valorTotal) {
+    return res.status(400).json({ 
+        erro: `Saldo insuficiente. Saldo atual: R$ ${saldoAtual.toFixed(2)}. Total da locacao: R$ ${valorTotal.toFixed(2)}` 
+    });
+}
     // obtem uma conexao dedicada para a transacao
     const conn = await pool.getConnection();
 
@@ -443,10 +470,69 @@ app.post('/api/locacoes', async (req, res) => {
     }
 });
 
+// ==================== ROTA PARA REGISTRAR DEVOLUCAO ====================
+// atualiza a data_devolucao de um item especifico
+// tambem restaura o estoque do filme (quantidade + 1)
+// a condicao data_devolucao IS NULL impede devolucoes duplicadas
+// utiliza transacao para garantir consistencia dos dados
+app.put('/api/itens/:id/devolver', async (req, res) => {
+    const itemId = req.params.id;
+    
+    try {
+        // verifica se o item existe e se ja foi devolvido
+        const [itemRows] = await pool.query(
+            'SELECT itn_fil_id, data_devolucao FROM itens WHERE itn_id = ?',
+            [itemId]
+        );
+        
+        if (itemRows.length === 0) {
+            return res.status(404).json({ erro: 'Item não encontrado' });
+        }
+        
+        // impede devolucao duplicada
+        if (itemRows[0].data_devolucao !== null) {
+            return res.status(400).json({ erro: 'Este item já foi devolvido anteriormente' });
+        }
+        
+        const filmeId = itemRows[0].itn_fil_id;
+        
+        // inicia uma transacao para garantir consistencia
+        const conn = await pool.getConnection();
+        
+        try {
+            await conn.beginTransaction();
+            
+            // registra a data de devolucao
+            await conn.execute(
+                'UPDATE itens SET data_devolucao = NOW() WHERE itn_id = ?',
+                [itemId]
+            );
+            
+            // restaura o estoque do filme
+            await conn.execute(
+                'UPDATE filmes SET quantidade = quantidade + 1 WHERE fil_id = ?',
+                [filmeId]
+            );
+            
+            await conn.commit();
+            
+            res.json({ mensagem: 'Devolução registrada com sucesso' });
+        } catch (error) {
+            await conn.rollback();
+            throw error;
+        } finally {
+            conn.release();
+        }
+    } catch (error) {
+        console.error('erro ao registrar devolucao:', error);
+        res.status(500).json({ erro: 'Erro interno do servidor' });
+    }
+});
 // ==================== ROTA DE CONSULTA DE LOCAÇÕES (JOIN) ====================
 
 // CONSULTA DE LOCAÇÕES: join entre cinco tabelas
 // conforme exemplo da aula 11 pagina 15
+// consulta de locacoes com join - ordenado por nome do cliente
 app.get('/api/locacoes', async (req, res) => {
     try {
         const sql = `
@@ -460,7 +546,7 @@ app.get('/api/locacoes', async (req, res) => {
             JOIN itens i ON l.loc_id = i.itn_loc_id
             JOIN filmes f ON i.itn_fil_id = f.fil_id
             JOIN categorias cat ON f.fil_cat_id = cat.cat_id
-            ORDER BY l.loc_id, i.itn_id
+            ORDER BY c.cli_nome ASC, l.loc_data_cad DESC
         `;
 
         const [rows] = await pool.query(sql);
@@ -471,6 +557,54 @@ app.get('/api/locacoes', async (req, res) => {
     }
 });
 
+// ==================== ROTA DE CONSULTA DE LOCAÇÕES AGRUPADAS ====================
+// retorna os dados organizados por cliente para visualizacao em acordeao
+// cada cliente possui um array de suas locacoes com os respectivos itens
+// inclui informacao se cada item ja foi devolvido (DATA_DEVOLUCAO)
+app.get('/api/locacoes/agrupadas', async (req, res) => {
+    try {
+        // busca todos os clientes ordenados por nome
+        const [clientes] = await pool.query(
+            'SELECT cli_id, cli_nome, cli_saldo FROM clientes ORDER BY cli_nome ASC'
+        );
+        
+        const resultado = [];
+        
+        // para cada cliente, busca suas locacoes e itens
+        for (const cliente of clientes) {
+            const [locacoes] = await pool.query(`
+                SELECT 
+                    l.loc_id, 
+                    l.loc_data_cad,
+                    i.itn_id,
+                    i.itn_valor_loc,
+                    i.data_devolucao,
+                    f.fil_nome,
+                    c.cat_nome
+                FROM locacoes l
+                JOIN itens i ON l.loc_id = i.itn_loc_id
+                JOIN filmes f ON i.itn_fil_id = f.fil_id
+                JOIN categorias c ON f.fil_cat_id = c.cat_id
+                WHERE l.loc_cli_id = ?
+                ORDER BY l.loc_data_cad DESC, i.itn_id ASC
+            `, [cliente.cli_id]);
+            
+            resultado.push({
+                cliente: {
+                    id: cliente.cli_id,
+                    nome: cliente.cli_nome,
+                    saldo: parseFloat(cliente.cli_saldo)
+                },
+                locacoes: locacoes
+            });
+        }
+        
+        res.json(resultado);
+    } catch (error) {
+        console.error('erro ao consultar locacoes agrupadas:', error);
+        res.status(500).json({ erro: 'erro interno do servidor' });
+    }
+});
 // ==================== ROTA PARA PÁGINA INICIAL ====================
 
 // cria uma rota para a pagina inicial (endereco /)
@@ -482,6 +616,83 @@ app.get('/', (req, res) => {
 });
 
 // ==================== INICIA O SERVIDOR ====================
+
+// ==================== ROTA PARA EXCLUIR LOCACAO INTEIRA ====================
+// exclui uma locacao apenas se nenhum dos seus itens tiver sido devolvido
+// verifica se todos os itens possuem data_devolucao = null
+// antes de excluir, restaura o estoque dos filmes
+// utiliza transacao para garantir consistencia dos dados
+app.delete('/api/locacoes/:id', async (req, res) => {
+    const locacaoId = req.params.id;
+    
+    // obtem uma conexao dedicada para a transacao
+    const conn = await pool.getConnection();
+    
+    try {
+        await conn.beginTransaction();
+        
+        // verifica se a locacao possui itens ja devolvidos
+        const [itensDevolvidos] = await conn.query(
+            'SELECT COUNT(*) as total FROM itens WHERE itn_loc_id = ? AND data_devolucao IS NOT NULL',
+            [locacaoId]
+        );
+        
+        if (itensDevolvidos[0].total > 0) {
+            await conn.rollback();
+            return res.status(400).json({ 
+                erro: 'Não é possível excluir esta locação pois ela possui itens já devolvidos'
+            });
+        }
+        
+        // verifica se a locacao existe
+        const [locacaoRows] = await conn.query(
+            'SELECT loc_id FROM locacoes WHERE loc_id = ?',
+            [locacaoId]
+        );
+        
+        if (locacaoRows.length === 0) {
+            await conn.rollback();
+            return res.status(404).json({ erro: 'Locação não encontrada' });
+        }
+        
+        // busca todos os itens da locacao para restaurar o estoque
+        const [itens] = await conn.query(
+            'SELECT itn_fil_id FROM itens WHERE itn_loc_id = ?',
+            [locacaoId]
+        );
+        
+        // restaura o estoque de cada filme (aumenta a quantidade em 1)
+        for (const item of itens) {
+            await conn.execute(
+                'UPDATE filmes SET quantidade = quantidade + 1 WHERE fil_id = ?',
+                [item.itn_fil_id]
+            );
+        }
+        
+        // exclui a locacao (os itens serao excluidos automaticamente pelo ON DELETE CASCADE)
+        const [result] = await conn.execute(
+            'DELETE FROM locacoes WHERE loc_id = ?',
+            [locacaoId]
+        );
+        
+        if (result.affectedRows === 0) {
+            await conn.rollback();
+            return res.status(404).json({ erro: 'Locação não encontrada' });
+        }
+        
+        await conn.commit();
+        
+        res.json({ mensagem: `Locação #${locacaoId} excluída.` });
+        
+    } catch (error) {
+        await conn.rollback();
+        console.error('erro ao excluir locacao:', error);
+        res.status(500).json({ erro: 'Erro interno do servidor' });
+        
+    } finally {
+        conn.release();
+    }
+});
 
 // inicia o servidor na porta definida
 // o servidor fica escutando aguardando conexoes
